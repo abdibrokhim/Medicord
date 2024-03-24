@@ -52,6 +52,7 @@ dependencies:
   dio: ^5.4.1
   open_file: ^3.3.2
   firebase_storage: ^11.6.6
+  google_fonts: ^6.2.0
 
 dev_dependencies:
   flutter_test:

@@ -44,13 +44,40 @@ class _CustomDropdownWithSearchState extends State<CustomDropdownWithSearch> {
         return GestureDetector(
           onTap: () => _showItemsList(context),
           child: AbsorbPointer(
-            child: Padding(padding: const EdgeInsets.all(16.0),
-              child: TextFormField(
-                controller: TextEditingController(text: selected['name'] ?? ''),
-                decoration: InputDecoration(
-                  labelText: widget.itemName,
-                ),
-              ),
+            child: Padding(padding: const EdgeInsets.all(0.0),
+              child: 
+              
+              TextFormField(
+  controller: TextEditingController(text: selected['name'] ?? ''),
+  style: TextStyle(
+    color: Colors.black, // Text color inside the field
+  ),
+  decoration: InputDecoration(
+    floatingLabelBehavior: FloatingLabelBehavior.never, // Keeps the floating label text above the field
+    filled: true, // Enables the fillColor property
+    fillColor: Color(0xFFC3C3C3), // Background color for the TextFormField
+    labelText: widget.itemName,
+    labelStyle: TextStyle(
+      color: Colors.black, // Color for the label when it is above the TextFormField
+    ),
+    border: OutlineInputBorder( // Outline border when TextFormField is enabled
+      borderSide: BorderSide.none, // No border side
+      borderRadius: BorderRadius.circular(5.0), // Rounded corners like the CustomDropdownButton
+    ),
+    enabledBorder: OutlineInputBorder( // Outline border when TextFormField is enabled and not focused
+      borderSide: BorderSide.none,
+      borderRadius: BorderRadius.circular(5.0),
+    ),
+    focusedBorder: OutlineInputBorder( // Outline border when TextFormField is focused
+      borderSide: BorderSide(
+        color: Colors.black, // Color for the focused border
+      ),
+      borderRadius: BorderRadius.circular(5.0),
+    ),
+    suffixIcon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.black), // Change to the icon you want
+  ),
+),
+
             ),
           ),
         );
@@ -65,6 +92,8 @@ class _CustomDropdownWithSearchState extends State<CustomDropdownWithSearch> {
       context: context,
       builder: (BuildContext context) {
         return Dialog(
+          surfaceTintColor: const Color.fromARGB(255, 31, 33, 38),
+          backgroundColor: const Color.fromARGB(255, 31, 33, 38),
           child: SizedBox(
             width: 300,
             height: 500,
@@ -73,11 +102,37 @@ class _CustomDropdownWithSearchState extends State<CustomDropdownWithSearch> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: TextField(
-                    controller: searchController,
-                    decoration: InputDecoration(
-                      labelText: 'Search',
-                      prefixIcon: const Icon(Icons.search),
+                  child: 
+                  TextField(
+  cursorColor: Colors.white, // Keeps the cursor white
+  controller: searchController,
+  style: TextStyle(
+    color: Colors.white, // Text color
+  ),
+  decoration: InputDecoration(
+    floatingLabelBehavior: FloatingLabelBehavior.never, // Keeps the floating label text above the field
+    floatingLabelStyle: TextStyle(
+      color: Colors.transparent, // Keeps the floating label text white
+    ),
+    labelText: 'Search',
+    labelStyle: TextStyle(
+      color: Colors.white, // Keeps the label text white even when focused
+    ),
+    prefixIcon: const Icon(
+      Icons.search,
+      color: Colors.white,
+    ),
+    enabledBorder: OutlineInputBorder(
+      // Normal state border
+      borderSide: BorderSide.none),
+    focusedBorder: OutlineInputBorder(
+      // Border when TextField is focused
+      borderSide: BorderSide.none
+    ),
+    // Removes the underline
+    border: InputBorder.none,
+
+                  
                       suffixIcon: searchController.text.isNotEmpty 
                         ? IconButton(
                             onPressed: () {
@@ -89,7 +144,10 @@ class _CustomDropdownWithSearchState extends State<CustomDropdownWithSearch> {
                                 selected = {};
                               });
                             },
-                            icon: Icon(Icons.clear) 
+                            icon: Icon(
+                              Icons.clear,
+                              color: Colors.white,
+                            )
                           )
                         : null,
                     ),
@@ -103,13 +161,20 @@ class _CustomDropdownWithSearchState extends State<CustomDropdownWithSearch> {
                     },
                   ),
                 ),
+                Divider(color: Colors.white),
                 Expanded(
                   child: ListView.builder(
                     itemCount: filteredItems.length,
                     itemBuilder: (context, index) {
                       final item = filteredItems[index];
                       return ListTile(
-                        title: Text(item),
+                        title: Text(
+                          item,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
+                        ),
                         onTap: () {
                           Navigator.of(context).pop();
                           setState(() {

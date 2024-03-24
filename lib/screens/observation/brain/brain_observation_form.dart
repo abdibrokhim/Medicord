@@ -2,6 +2,7 @@ import 'package:brainmri/models/conclusion_model.dart';
 import 'package:brainmri/models/observation_mode.dart';
 import 'package:brainmri/screens/observation/brain/brain_observation_model.dart';
 import 'package:brainmri/screens/observation/components/custom_dropdown.dart';
+import 'package:brainmri/screens/observation/components/custom_textformfield.dart';
 import 'package:brainmri/screens/observation/components/template.dart';
 import 'package:brainmri/screens/user/user_reducer.dart';
 import 'package:brainmri/store/app_logs.dart';
@@ -203,14 +204,18 @@ class _BrainObservationFormState extends State<BrainObservationForm> {
       converter: (appState) => appState.state.appState.userState,
       builder: (context, userState) {
         return
+        Container(
+              color: const Color.fromARGB(255, 31, 33, 38),
+              child:
 
     SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.only(top: 0.0, bottom: 32),
       child: 
       Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const SizedBox(height: 16),
+
                                 if (userState.isSavingNewPatient)
                         const Column(
                           children: [
@@ -243,11 +248,32 @@ class _BrainObservationFormState extends State<BrainObservationForm> {
                         ),
                         
                         const SizedBox(height: 16),
+
+                        Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+                          Expanded(
+                            flex: 3,
+              child: 
+            Text('Select or add patient'
+            , style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+            ),
+            ),
+            ),
+            Expanded(
+              flex: 2,
+              child: 
       CustomDropdownWithSearch( 
           items: userState.patientNames,
-          itemName: 'Patient name',
+          itemName: 'Select',
           dState: 0
         ),
+        ),
+        ],
+      ),
 ListTile(
   title: const Text('Other'),
   leading: Checkbox(
@@ -310,139 +336,352 @@ Expanded(child:
             )
         ],) : Container(),
 
-    TextField(
-      decoration: const InputDecoration(labelText: 'Scanning Technique'),
-      onChanged: (value) => setState(() => observation.scanningTechnique = value),
-    ),
-    TextField(
-      decoration: const InputDecoration(labelText: 'Basal Ganglia Location'),
-      onChanged: (value) => setState(() => observation.basalGangliaLocation = value),
-    ),
-    TextField(
-      decoration: const InputDecoration(labelText: 'Basal Ganglia Symmetry'),
-      onChanged: (value) => setState(() => observation.basalGangliaSymmetry = value),
-    ),
-    TextField(
-      decoration: const InputDecoration(labelText: 'Basal Ganglia Contour'),
-      onChanged: (value) => setState(() => observation.basalGangliaContour = value),
-    ),
-    TextField(
-      decoration: const InputDecoration(labelText: 'Basal Ganglia Dimensions'),
-      onChanged: (value) => setState(() => observation.basalGangliaDimensions = value),
-    ),
-    TextField(
-      decoration: const InputDecoration(labelText: 'Basal Ganglia Signal'),
-      onChanged: (value) => setState(() => observation.basalGangliaSignal = value),
-    ),
-    TextField(
-      decoration: const InputDecoration(labelText: 'Lateral Ventricles Width Right (mm)'),
-      keyboardType: TextInputType.number,
-      onChanged: (value) => setState(() => observation.lateralVentriclesWidthRight = double.tryParse(value) ?? 0.0),
-    ),
-    TextField(
-      decoration: const InputDecoration(labelText: 'Lateral Ventricles Width Left (mm)'),
-      keyboardType: TextInputType.number,
-      onChanged: (value) => setState(() => observation.lateralVentriclesWidthLeft = double.tryParse(value) ?? 0.0),
-    ),
-    TextField(
-      decoration: const InputDecoration(labelText: 'Third Ventricle Width (mm)'),
-      keyboardType: TextInputType.number,
-      onChanged: (value) => setState(() => observation.thirdVentricleWidth = double.tryParse(value) ?? 0.0),
-    ),
-    TextField(
-      decoration: const InputDecoration(labelText: 'Sylvian Aqueduct Condition'),
-      onChanged: (value) => setState(() => observation.sylvianAqueductCondition = value),
-    ),
-    TextField(
-      decoration: const InputDecoration(labelText: 'Fourth Ventricle Condition'),
-      onChanged: (value) => setState(() => observation.fourthVentricleCondition = value),
-    ),
-    TextField(
-      decoration: const InputDecoration(labelText: 'Corpus Callosum Condition'),
-      onChanged: (value) => setState(() => observation.corpusCallosumCondition = value),
-    ),
-    TextField(
-      decoration: const InputDecoration(labelText: 'Brain Stem Condition'),
-      onChanged: (value) => setState(() => observation.brainStemCondition = value),
-    ),
-    TextField(
-      decoration: const InputDecoration(labelText: 'Cerebellum Condition'),
-      onChanged: (value) => setState(() => observation.cerebellumCondition = value),
-    ),
-    TextField(
-      decoration: const InputDecoration(labelText: 'Craniovertebral Junction Condition'),
-      onChanged: (value) => setState(() => observation.craniovertebralJunctionCondition = value),
-    ),
-    TextField(
-      decoration: const InputDecoration(labelText: 'Pituitary Gland Condition'),
-      onChanged: (value) => setState(() => observation.pituitaryGlandCondition = value),
-    ),
-    TextField(
-      decoration: const InputDecoration(labelText: 'Orbital Cones Shape'),
-      onChanged: (value) => setState(() => observation.orbitalConesShape = value),
-    ),
-    TextField(
-      decoration: const InputDecoration(labelText: 'Eyeballs Shape and Size'),
-      onChanged: (value) => setState(() => observation.eyeballsShapeSize = value),
-    ),
-    TextField(
-      decoration: const InputDecoration(labelText: 'Optic Nerves Diameter (mm)'),
-      keyboardType: TextInputType.number,
-      onChanged: (value) => setState(() => observation.opticNervesDiameter = double.tryParse(value) ?? 0.0),
-    ),
-    TextField(
-      decoration: const InputDecoration(labelText: 'Extraocular Muscles Condition'),
-      onChanged: (value) => setState(() => observation.extraocularMusclesCondition = value),
-    ),
-    TextField(
-      decoration: const InputDecoration(labelText: 'Retrobulbar Fatty Tissue Condition'),
-      onChanged: (value) => setState(() => observation.retrobulbarFattyTissueCondition = value),
-    ),
+CustomTextFormField(
+  labelText: 'Scanning Technique',
+  isInputEmpty: observation.scanningTechnique.isEmpty,
+  onChanged: (value) => setState(() => observation.scanningTechnique = value),
+  onClear: () => setState(() => observation.scanningTechnique = ''),
+  initialValue: observation.scanningTechnique,
+),
 
-    ListTile(
-  title: const Text('Cysts Presence in Paranasal Sinuses'),
-  leading: Checkbox(
-    value: observation.sinusesCystsPresence,
-    onChanged: (bool? value) {
-      setState(() {
-        observation.sinusesCystsPresence = value!;
-      });
-    },
+const SizedBox(height: 24.0),
+
+//==== Basal Ganglia ====//
+
+Column(crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+Text(
+  'Basal Ganglia', 
+  textAlign: TextAlign.left,
+  style: TextStyle(
+  color: Colors.white,
+  fontSize: 18,
+  fontWeight: FontWeight.w700,
+),),
+const SizedBox(height: 14.0),
+CustomTextFormField(
+  labelText: 'Location',
+  isInputEmpty: observation.basalGangliaLocation.isEmpty,
+  onChanged: (value) => setState(() => observation.basalGangliaLocation = value),
+  onClear: () => setState(() => observation.basalGangliaLocation = ''),
+  initialValue: observation.basalGangliaLocation,
+),
+const SizedBox(height: 14.0),
+CustomTextFormField(
+  labelText: 'Symmetry',
+  isInputEmpty: observation.basalGangliaSymmetry.isEmpty,
+  onChanged: (value) => setState(() => observation.basalGangliaSymmetry = value),
+  onClear: () => setState(() => observation.basalGangliaSymmetry = ''),
+  initialValue: observation.basalGangliaSymmetry,
+),
+const SizedBox(height: 14.0),
+CustomTextFormField(
+  labelText: 'Dimensions',
+  isInputEmpty: observation.basalGangliaContour.isEmpty,
+  onChanged: (value) => setState(() => observation.basalGangliaContour = value),
+  onClear: () => setState(() => observation.basalGangliaContour = ''),
+  initialValue: observation.basalGangliaContour,
+),
+const SizedBox(height: 14.0),
+CustomTextFormField(
+  labelText: 'Signal',
+  isInputEmpty: observation.basalGangliaSignal.isEmpty,
+  onChanged: (value) => setState(() => observation.basalGangliaSignal = value),
+  onClear: () => setState(() => observation.basalGangliaSignal = ''),
+  initialValue: observation.basalGangliaSignal,
+),
+],),
+
+const SizedBox(height: 24.0),
+
+//==== Brain Grooves and Ventricles ====//
+
+Column(crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+Text(
+  'Brain Grooves and Ventricles',
+  textAlign: TextAlign.left,
+  style: TextStyle(
+  color: Colors.white,
+  fontSize: 18,
+  fontWeight: FontWeight.w700,
+),),
+const SizedBox(height: 14.0),
+CustomTextFormField(
+  labelText: 'Lateral Ventricles Width Right (mm)',
+  isInputEmpty: observation.lateralVentriclesWidthRight == 0.0,
+  onChanged: (value) => setState(() => observation.lateralVentriclesWidthRight = double.tryParse(value) ?? 0.0),
+  onClear: () => setState(() => observation.lateralVentriclesWidthRight = 0.0),
+  initialValue: observation.lateralVentriclesWidthRight.toString(),
+),
+const SizedBox(height: 14.0),
+CustomTextFormField(
+  labelText: 'Lateral Ventricles Width Left (mm)',
+  isInputEmpty: observation.lateralVentriclesWidthLeft == 0.0,
+  onChanged: (value) => setState(() => observation.lateralVentriclesWidthLeft = double.tryParse(value) ?? 0.0),
+  onClear: () => setState(() => observation.lateralVentriclesWidthLeft = 0.0),
+  initialValue: observation.lateralVentriclesWidthLeft.toString(),
+),
+const SizedBox(height: 14.0),
+CustomTextFormField(
+  labelText: 'Third Ventricle Width (mm)',
+  isInputEmpty: observation.thirdVentricleWidth == 0.0,
+  onChanged: (value) => setState(() => observation.thirdVentricleWidth = double.tryParse(value) ?? 0.0),
+  onClear: () => setState(() => observation.thirdVentricleWidth = 0.0),
+  initialValue: observation.thirdVentricleWidth.toString(),
+),
+const SizedBox(height: 14.0),
+CustomTextFormField(
+  labelText: 'Sylvian Aqueduct Condition',
+  isInputEmpty: observation.sylvianAqueductCondition.isEmpty,
+  onChanged: (value) => setState(() => observation.sylvianAqueductCondition = value),
+  onClear: () => setState(() => observation.sylvianAqueductCondition = ''),
+  initialValue: observation.sylvianAqueductCondition,
+),
+const SizedBox(height: 14.0),
+CustomTextFormField(
+  labelText: 'Fourth Ventricle Condition',
+  isInputEmpty: observation.fourthVentricleCondition.isEmpty,
+  onChanged: (value) => setState(() => observation.fourthVentricleCondition = value),
+  onClear: () => setState(() => observation.fourthVentricleCondition = ''),
+  initialValue: observation.fourthVentricleCondition,
+),
+],),
+
+
+const SizedBox(height: 24.0),
+
+//==== Brain Structures ====//
+
+Column(crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+Text(
+  'Brain Structures',
+  textAlign: TextAlign.left,
+  style: TextStyle(
+  color: Colors.white,
+  fontSize: 18,
+  fontWeight: FontWeight.w700,
+),),
+const SizedBox(height: 14.0),
+CustomTextFormField(
+  labelText: 'Corpus Callosum Condition',
+  isInputEmpty: observation.corpusCallosumCondition.isEmpty,
+  onChanged: (value) => setState(() => observation.corpusCallosumCondition = value),
+  onClear: () => setState(() => observation.corpusCallosumCondition = ''),
+  initialValue: observation.corpusCallosumCondition,
+),
+const SizedBox(height: 14.0),
+CustomTextFormField(
+  labelText: 'Brain Stem Condition',
+  isInputEmpty: observation.brainStemCondition.isEmpty,
+  onChanged: (value) => setState(() => observation.brainStemCondition = value),
+  onClear: () => setState(() => observation.brainStemCondition = ''),
+  initialValue: observation.brainStemCondition,
+),
+const SizedBox(height: 14.0),
+CustomTextFormField(
+  labelText: 'Cerebellum Condition',
+  isInputEmpty: observation.cerebellumCondition.isEmpty,
+  onChanged: (value) => setState(() => observation.cerebellumCondition = value),
+  onClear: () => setState(() => observation.cerebellumCondition = ''),
+  initialValue: observation.cerebellumCondition,
+),
+const SizedBox(height: 14.0),
+CustomTextFormField(
+  labelText: 'Craniovertebral Junction Condition',
+  isInputEmpty: observation.craniovertebralJunctionCondition.isEmpty,
+  onChanged: (value) => setState(() => observation.craniovertebralJunctionCondition = value),
+  onClear: () => setState(() => observation.craniovertebralJunctionCondition = ''),
+  initialValue: observation.craniovertebralJunctionCondition,
+),
+const SizedBox(height: 14.0),
+CustomTextFormField(
+  labelText: 'Pituitary Gland Condition',
+  isInputEmpty: observation.pituitaryGlandCondition.isEmpty,
+  onChanged: (value) => setState(() => observation.pituitaryGlandCondition = value),
+  onClear: () => setState(() => observation.pituitaryGlandCondition = ''),
+  initialValue: observation.pituitaryGlandCondition,
+),
+],),
+
+
+const SizedBox(height: 24.0),
+
+//==== Optic Nerves and Orbital Structures ====//
+
+Column(crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+Text(
+  'Optic Nerves and Orbital Structures',
+  textAlign: TextAlign.left,
+  style: TextStyle(
+  color: Colors.white,
+  fontSize: 18,
+  fontWeight: FontWeight.w700,
+),),
+const SizedBox(height: 14.0),
+CustomTextFormField(
+  labelText: 'Orbital Cones Shape',
+  isInputEmpty: observation.orbitalConesShape.isEmpty,
+  onChanged: (value) => setState(() => observation.orbitalConesShape = value),
+  onClear: () => setState(() => observation.orbitalConesShape = ''),
+  initialValue: observation.orbitalConesShape,
+),
+const SizedBox(height: 14.0),
+CustomTextFormField(
+  labelText: 'Eyeballs Shape and Size',
+  isInputEmpty: observation.eyeballsShapeSize.isEmpty,
+  onChanged: (value) => setState(() => observation.eyeballsShapeSize = value),
+  onClear: () => setState(() => observation.eyeballsShapeSize = ''),
+  initialValue: observation.eyeballsShapeSize,
+),
+const SizedBox(height: 14.0),
+CustomTextFormField(
+  labelText: 'Optic Nerves Diameter (mm)',
+  isInputEmpty: observation.opticNervesDiameter == 0.0,
+  onChanged: (value) => setState(() => observation.opticNervesDiameter = double.tryParse(value) ?? 0.0),
+  onClear: () => setState(() => observation.opticNervesDiameter = 0.0),
+  initialValue: observation.opticNervesDiameter.toString(),
+),
+const SizedBox(height: 14.0),
+CustomTextFormField(
+  labelText: 'Extraocular Muscles Condition',
+  isInputEmpty: observation.extraocularMusclesCondition.isEmpty,
+  onChanged: (value) => setState(() => observation.extraocularMusclesCondition = value),
+  onClear: () => setState(() => observation.extraocularMusclesCondition = ''),
+  initialValue: observation.extraocularMusclesCondition,
+),
+const SizedBox(height: 14.0),
+CustomTextFormField(
+  labelText: 'Retrobulbar Fatty Tissue Condition',
+  isInputEmpty: observation.retrobulbarFattyTissueCondition.isEmpty,
+  onChanged: (value) => setState(() => observation.retrobulbarFattyTissueCondition = value),
+  onClear: () => setState(() => observation.retrobulbarFattyTissueCondition = ''),
+  initialValue: observation.retrobulbarFattyTissueCondition,
+),
+],),
+
+const SizedBox(height: 24.0),
+
+//==== Paranasal Sinuses ====//
+
+Column(crossAxisAlignment: CrossAxisAlignment.start,
+
+  children: [
+Text(
+  'Paranasal Sinuses',
+  textAlign: TextAlign.left,
+  style: TextStyle(
+  color: Colors.white,
+  fontSize: 18,
+  fontWeight: FontWeight.w700,
+),),
+const SizedBox(height: 14.0),
+    
+    CustomTextFormField(
+  labelText: 'Cysts Presence',
+  isInputEmpty: !observation.sinusesCystsPresence,
+  onChanged: (value) => setState(() => observation.sinusesCystsPresence = value == 'true'),
+  onClear: () => setState(() => observation.sinusesCystsPresence = false),
+  initialValue: observation.sinusesCystsPresence ? 'Yes' : 'No',
+  isBoolean: true,
+),
+const SizedBox(height: 14.0),
+CustomTextFormField(
+  labelText: 'Cysts Size (mm)',
+  isInputEmpty: observation.sinusesCystsSize == 0.0,
+  onChanged: (value) => setState(() => observation.sinusesCystsSize = double.tryParse(value) ?? 0.0),
+  onClear: () => setState(() => observation.sinusesCystsSize = 0.0),
+  initialValue: observation.sinusesCystsSize.toString(),
+),
+const SizedBox(height: 14.0),
+CustomTextFormField(
+  labelText: 'Sinuses Pneumatization',
+  isInputEmpty: observation.sinusesPneumatization.isEmpty,
+  onChanged: (value) => setState(() => observation.sinusesPneumatization = value),
+  onClear: () => setState(() => observation.sinusesPneumatization = ''),
+  initialValue: observation.sinusesPneumatization,
+),
+],),
+
+
+const SizedBox(height: 24.0),
+
+//==== Additional Observations ====//
+
+Column(crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+Text(
+  'Additional Observations',
+  textAlign: TextAlign.left,
+  style: TextStyle(
+  color: Colors.white,
+  fontSize: 18,
+  fontWeight: FontWeight.w700,
+),),
+const SizedBox(height: 14.0),
+CustomTextFormField(
+  labelText: 'Anything else?',
+  isInputEmpty: observation.additionalObservations.isEmpty,
+  onChanged: (value) => setState(() => observation.additionalObservations = value),
+  onClear: () => setState(() => observation.additionalObservations = ''),
+  initialValue: observation.additionalObservations,
+  minLines: 4,
+),
+],),
+
+          const SizedBox(height: 24.0),
+          ElevatedButton(
+  onPressed: _generateConclusion,
+  style: ElevatedButton.styleFrom(
+    elevation: 5,
+    backgroundColor: Color(0xFF232428), // Set the background color
+    foregroundColor: Colors.white, // Set the text color (applies to foreground)
+    textStyle: TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.w700, 
+    ),
+    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 40), // Set the padding
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(Radius.circular(5)), // Set the border radius
+    ),
+  ),
+  child: Text(
+    userState.conclusion.isEmpty ? 'Generate' : 'Regenerate'
   ),
 ),
-    TextField(
-      decoration: const InputDecoration(labelText: 'Cysts Size (mm)'),
-      keyboardType: TextInputType.number,
-      onChanged: (value) => setState(() => observation.sinusesCystsSize = double.tryParse(value) ?? 0.0),
-    ),
-    TextField(
-      decoration: const InputDecoration(labelText: 'Sinuses Pneumatization'),
-      onChanged: (value) => setState(() => observation.sinusesPneumatization = value),
-    ),
-    TextField(
-      decoration: const InputDecoration(labelText: 'Additional Observations'),
-      onChanged: (value) => setState(() => observation.additionalObservations = value),
-    ),
-          
-          const SizedBox(height: 16.0),
-          ElevatedButton(
-            onPressed: _generateConclusion,
-            child: Text(
-              userState.conclusion.isEmpty ? 'Generate Conclusion' : 'Regenerate Conclusion'
-            ),
-          ),
+
 
           if (userState.conclusion.isNotEmpty)
+          Column(children: [
             Text(
               'Conclusion:\n${userState.conclusion}'
             ),
 
           const SizedBox(height: 16.0),
           ElevatedButton(
-            onPressed: showDialoga,
-            child: Text('Submit'),
-          ),
+  onPressed: showDialoga,
+  style: ElevatedButton.styleFrom(
+    elevation: 5,
+    backgroundColor: Color(0xFF232428), // Set the background color
+    foregroundColor: Colors.white, // Set the text color (applies to foreground)
+    textStyle: TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.w700, 
+    ),
+    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 40), // Set the padding
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(Radius.circular(5)), // Set the border radius
+    ),
+  ),
+  child: Text(
+    'Submit'
+  ),
+),
+          ],)
         ],
+      ),
       ),
     );
       },

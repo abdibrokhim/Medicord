@@ -1,4 +1,6 @@
+import 'package:brainmri/utils/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:brainmri/store/app_store.dart';
 import 'package:brainmri/screens/observation/add_observation_screen.dart';
@@ -32,47 +34,130 @@ class _MainLayoutState extends State<MainLayout> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_tabTitles[_selectedIndex]),
+        iconTheme: IconThemeData(color: Colors.white),
+        title: Text(_tabTitles[_selectedIndex],
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+        ),
+        backgroundColor: const Color.fromARGB(255, 23, 24, 28),
       ),
       drawer: Drawer(
-        child: ListView(
-          children: [
-            const DrawerHeader(
+  backgroundColor: const Color.fromARGB(255, 40, 42, 49),
+  child: Column(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween, // Aligns the main content and the version info
+    children: [
+      Expanded( // Wraps the main content in an Expanded widget
+        child:
+  ListView(
+    physics: const NeverScrollableScrollPhysics(),
+    padding: EdgeInsets.zero,
+    children: [
+
+DrawerHeader(
               decoration: BoxDecoration(
-                color: Colors.blue,
+                color: Color.fromARGB(255, 23, 24, 28),
               ),
-              child: Text('BrAIn MRI'),
-            ),
-            ListTile(
-              title: const Text('Add Observation'),
-              onTap: () {
-                setState(() {
-                  _selectedIndex = 0;
-                });
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text('All Observations'),
-              onTap: () {
-                setState(() {
-                  _selectedIndex = 1;
-                });
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text('Organization'),
-              onTap: () {
-                setState(() {
-                  _selectedIndex = 2;
-                });
-                Navigator.pop(context);
-              },
-            ),
-          ],
+  // color: Color(0xff2B2D31),
+  padding: const EdgeInsets.symmetric(vertical: 28.0, horizontal: 24.0),
+  child: Align(
+    alignment: Alignment.center,
+    child: 
+        Container(
+          padding: EdgeInsets.zero,
+          alignment: Alignment.centerLeft,
+          child:
+                Text(
+          'CoMed',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+          ),
         ),
+        ),
+  ),
+),
+      const SizedBox(height: 24), // Added space before ListTiles
+      ListTile(
+        leading: const Icon(Icons.add_circle_outline_rounded, color: Colors.white, size: 26,),
+        title: const Text(
+          'Add Observation',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        onTap: () {
+          setState(() {
+            _selectedIndex = 0;
+          });
+          Navigator.pop(context);
+        },
+        tileColor: _selectedIndex == 0 ? const Color.fromARGB(255, 23, 24, 28) : null, // Added blue color on select
       ),
+      const SizedBox(height: 10), // Added space before ListTiles
+      ListTile(
+        leading: const Icon(Icons.explore_outlined, color: Colors.white, size: 26,),
+        title: const Text('All Observations', 
+          style: TextStyle(
+            color: Colors.white, 
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        onTap: () {
+          setState(() {
+            _selectedIndex = 1;
+          });
+          Navigator.pop(context);
+        },
+        tileColor: _selectedIndex == 1 ? const Color.fromARGB(255, 23, 24, 28) : null, // Added blue color on select
+      ),
+      const SizedBox(height: 10), // Added space before ListTiles
+      ListTile(
+        leading: const Icon(
+          Icons.account_circle_outlined, color: Colors.white,
+          size: 26,
+        ),
+        title: const Text('Organization', 
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        onTap: () {
+          setState(() {
+            _selectedIndex = 2;
+          });
+          Navigator.pop(context);
+        },
+        tileColor: _selectedIndex == 2 ? const Color.fromARGB(255, 23, 24, 28) : null, // Added blue color on select
+      ),
+      
+      const SizedBox(height: 24), // Added space before app version
+
+    ],
+  ),
+  ),
+  Padding(padding: const EdgeInsets.only(bottom: 20.0), // Added padding to version info
+  child: 
+      Text(
+          textAlign: TextAlign.center,
+          'Version: 1.0.0', // Added app version
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 14,
+          ),
+        ),
+        ),
+    ],),
+),
+
       body: _tabs[_selectedIndex],
     );
   }

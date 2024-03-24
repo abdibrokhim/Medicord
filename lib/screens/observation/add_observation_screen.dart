@@ -1,4 +1,6 @@
 import 'package:brainmri/screens/observation/brain/brain_observation_form.dart';
+import 'package:brainmri/screens/observation/components/custom_dropdown.dart';
+import 'package:brainmri/screens/observation/components/custom_dropdown_button.dart';
 import 'package:brainmri/screens/user/user_reducer.dart';
 import 'package:brainmri/store/app_store.dart';
 import 'package:flutter/material.dart';
@@ -49,52 +51,51 @@ class _AddObservationScreenState extends State<AddObservationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body:
-    Refreshable(
-            refreshController: _refreshController,
-            onRefresh: _onRefresh,
-            onLoading: _onLoading,
-            child: 
+
+    // Refreshable(
+    //         refreshController: _refreshController,
+    //         onRefresh: _onRefresh,
+    //         onLoading: _onLoading,
+    //         child: 
+
+    Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+              color: const Color.fromARGB(255, 31, 33, 38),
+              child:
+
     SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          DropdownButton<String>(
-            alignment: AlignmentDirectional.center,
-            value: _selectedOption.isEmpty ? null : _selectedOption,
-            hint: const Text('Select an Option'),
-            items: const [
-              DropdownMenuItem(value: 'Brain', child: Text('Brain')),
-              DropdownMenuItem(value: 'Lunger', child: Text('Lunger')),
-              DropdownMenuItem(value: 'Spine', child: Text('Spine')),
-              DropdownMenuItem(value: 'Heart', child: Text('Heart')),
-              DropdownMenuItem(value: 'Knee', child: Text('Knee')),
-            ],
-            onChanged: (value) {
-              setState(() {
-                _selectedOption = value ?? '';
-              });
-            },
-          ),
-          if (_selectedOption == 'Brain')
-            const BrainObservationForm(),
-          if (_selectedOption == 'Lunger')
-          const Center(child: 
-            const Text('We are working on that. Stay tuned!'),
-          ),
-          if (_selectedOption == 'Spine')
-          const Center(child: 
-            const Text('We are working on that. Stay tuned!'),
-          ),
-          if (_selectedOption == 'Heart')
-          const Center(child: 
-            const Text('We are working on that. Stay tuned!'),
-          ),
-          if (_selectedOption == 'Knee')
-          const Center(child: 
-            const Text('We are working on that. Stay tuned!'),
-          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+                          Expanded(
+                            flex: 3,
+              child: 
+            Text('Select scan type'
+            , style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+            ),
+            ),
+            ),
+                        Expanded(
+                          flex: 2,
+              child: 
+                  CustomDropdownWithSearch( 
+          items: [
+            {'name': 'Brain', 'id': '1'},
+          ],
+          itemName: 'Select',
+          dState: 0
+        ),
+        ),
         ],
       ),
+          const BrainObservationForm(),
+          ],)
       ),
       ),
     );
