@@ -1,7 +1,9 @@
 import 'package:brainmri/screens/user/user_reducer.dart';
 import 'package:brainmri/store/app_store.dart';
+import 'package:brainmri/utils/refreshable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
 
 
 class CustomDropdownWithSearch extends StatefulWidget {
@@ -32,6 +34,30 @@ class _CustomDropdownWithSearchState extends State<CustomDropdownWithSearch> {
   void dispose() {
     searchController.dispose();
     super.dispose();
+  }
+
+      void reFetchData()  {
+          print('refetching');
+      store.dispatch(FetchAllPatientNamesAction());
+
+  }
+
+    RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
+
+  void _onRefresh() async{
+    // monitor network fetch
+    await Future.delayed(Duration(milliseconds: 1000));
+    // if failed,use refreshFailed()
+    reFetchData();
+    _refreshController.refreshCompleted();
+  }
+
+  void _onLoading() async{
+    // monitor network fetch
+    await Future.delayed(Duration(milliseconds: 1000));
+    // if failed,use loadFailed(),if no data return,use LoadNodata()
+    _refreshController.loadComplete();
   }
   
   Map<String, String> selected = {};
@@ -86,113 +112,111 @@ class _CustomDropdownWithSearchState extends State<CustomDropdownWithSearch> {
   }
 
   void _showItemsList(BuildContext context) {
-    List<String> filteredItems = widget.items.map((e) => e['name']!).toList();
+  List<String> filteredItems = widget.items.map((e) => e['name']!).toList();
 
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          surfaceTintColor: const Color.fromARGB(255, 31, 33, 38),
-          backgroundColor: const Color.fromARGB(255, 31, 33, 38),
-          child: SizedBox(
-            width: 300,
-            height: 500,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: 
-                  TextField(
-  cursorColor: Colors.white, // Keeps the cursor white
-  controller: searchController,
-  style: TextStyle(
-    color: Colors.white, // Text color
-  ),
-  decoration: InputDecoration(
-    floatingLabelBehavior: FloatingLabelBehavior.never, // Keeps the floating label text above the field
-    floatingLabelStyle: TextStyle(
-      color: Colors.transparent, // Keeps the floating label text white
-    ),
-    labelText: 'Search',
-    labelStyle: TextStyle(
-      color: Colors.white, // Keeps the label text white even when focused
-    ),
-    prefixIcon: const Icon(
-      Icons.search,
-      color: Colors.white,
-    ),
-    enabledBorder: OutlineInputBorder(
-      // Normal state border
-      borderSide: BorderSide.none),
-    focusedBorder: OutlineInputBorder(
-      // Border when TextField is focused
-      borderSide: BorderSide.none
-    ),
-    // Removes the underline
-    border: InputBorder.none,
-
-                  
-                      suffixIcon: searchController.text.isNotEmpty 
-                        ? IconButton(
-                            onPressed: () {
-                              searchController.clear();
-                              filteredItems = widget.items.map((e) => e['name']!).toList();
-                              (context as Element).markNeedsBuild();
-
-                              setState(() {
-                                selected = {};
-                              });
-                            },
-                            icon: Icon(
-                              Icons.clear,
-                              color: Colors.white,
-                            )
-                          )
-                        : null,
-                    ),
-                    onChanged: (String value) {
-                      filteredItems = (widget.items.map((e) => e['name']!).toList() ?? []).where((item) {
-                        final itemLower = item.toLowerCase();
-                        final searchLower = value.toLowerCase();
-                        return itemLower.contains(searchLower);
-                      }).toList();
-                      (context as Element).markNeedsBuild();
-                    },
-                  ),
+  showModalBottomSheet(
+    context: context,
+    builder: (BuildContext context) {
+      return Container(
+        padding: const EdgeInsets.all(8.0),
+        height: 500,
+        color: const Color.fromARGB(255, 31, 33, 38),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              cursorColor: Colors.white,
+              controller: searchController,
+              style: TextStyle(
+                color: Colors.white,
+              ),
+              decoration: InputDecoration(
+                floatingLabelBehavior: FloatingLabelBehavior.never,
+                floatingLabelStyle: TextStyle(
+                  color: Colors.transparent,
                 ),
-                Divider(color: Colors.white),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: filteredItems.length,
-                    itemBuilder: (context, index) {
-                      final item = filteredItems[index];
-                      return ListTile(
-                        title: Text(
-                          item,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                          ),
-                        ),
-                        onTap: () {
-                          Navigator.of(context).pop();
+                labelText: 'Search',
+                labelStyle: TextStyle(
+                  color: Colors.white,
+                ),
+                prefixIcon: const Icon(
+                  Icons.search,
+                  color: Colors.white,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide.none,
+                ),
+                border: InputBorder.none,
+                suffixIcon: searchController.text.isNotEmpty
+                    ? IconButton(
+                        onPressed: () {
+                          searchController.clear();
+                          filteredItems = widget.items.map((e) => e['name']!).toList();
+                          (context as Element).markNeedsBuild();
                           setState(() {
-                            searchController.text = item;
-                            selected = {'id': widget.items.firstWhere((element) => element['name'] == item)['id']!, 'name': item};
-                            print('selected: $selected');
-                            StoreProvider.of<GlobalState>(context).dispatch(SelectPatientAction({'id': widget.items.firstWhere((element) => element['name'] == item)['id']!, 'name': item}));
+                            selected = {};
                           });
                         },
-                      );
-                    },
-                  ),
-                ),
-              ],
+                        icon: Icon(
+                          Icons.clear,
+                          color: Colors.white,
+                        ),
+                      )
+                    : null,
+              ),
+              onChanged: (String value) {
+                filteredItems = (widget.items.map((e) => e['name']!).toList() ?? []).where((item) {
+                  final itemLower = item.toLowerCase();
+                  final searchLower = value.toLowerCase();
+                  return itemLower.contains(searchLower);
+                }).toList();
+                (context as Element).markNeedsBuild();
+              },
             ),
-          ),
-        );
-      },
-    );
-  }
+            Divider(color: Colors.white),
+            Expanded(
+              child:     
+              Refreshable(
+            refreshController: _refreshController,
+            onRefresh: _onRefresh,
+            onLoading: _onLoading,
+            child: 
+              ListView.builder(
+                itemCount: filteredItems.length,
+                itemBuilder: (context, index) {
+                  final item = filteredItems[index];
+                  return ListTile(
+                    title: Text(
+                      item,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      setState(() {
+                        searchController.text = item;
+                        selected = {
+                          'id': widget.items.firstWhere((element) => element['name'] == item)['id']!,
+                          'name': item
+                        };
+                        StoreProvider.of<GlobalState>(context).dispatch(SelectPatientAction(selected));
+                      });
+                    },
+                  );
+                },
+              ),
+            ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
 }

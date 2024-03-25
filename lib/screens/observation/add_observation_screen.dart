@@ -4,9 +4,7 @@ import 'package:brainmri/screens/observation/components/custom_dropdown_button.d
 import 'package:brainmri/screens/user/user_reducer.dart';
 import 'package:brainmri/store/app_store.dart';
 import 'package:flutter/material.dart';
-import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
 
-import '../../utils/refreshable.dart';
 
 class AddObservationScreen extends StatefulWidget {
   const AddObservationScreen({super.key});
@@ -16,47 +14,11 @@ class AddObservationScreen extends StatefulWidget {
 }
 
 class _AddObservationScreenState extends State<AddObservationScreen> {
-  String _selectedOption = '';
-
-
-      void reFetchData()  {
-          print('refetching');
-          if (_selectedOption == 'Brain')
-            {
-              store.dispatch(FetchAllPatientNamesAction());
-
-          }
-  }
-
-  RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
-
-  void _onRefresh() async{
-    // monitor network fetch
-    await Future.delayed(Duration(milliseconds: 1000));
-    // if failed,use refreshFailed()
-    reFetchData();
-    _refreshController.refreshCompleted();
-  }
-
-  void _onLoading() async{
-    // monitor network fetch
-    await Future.delayed(Duration(milliseconds: 1000));
-    // if failed,use loadFailed(),if no data return,use LoadNodata()
-    _refreshController.loadComplete();
-  }
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body:
-
-    // Refreshable(
-    //         refreshController: _refreshController,
-    //         onRefresh: _onRefresh,
-    //         onLoading: _onLoading,
-    //         child: 
 
     Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),

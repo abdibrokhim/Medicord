@@ -97,7 +97,7 @@ DrawerHeader(
           });
           Navigator.pop(context);
         },
-        tileColor: _selectedIndex == 0 ? const Color.fromARGB(255, 23, 24, 28) : null, // Added blue color on select
+        tileColor: _selectedIndex == 0 ? const Color.fromARGB(255, 23, 24, 28) : null,
       ),
       const SizedBox(height: 10), // Added space before ListTiles
       ListTile(
@@ -115,7 +115,7 @@ DrawerHeader(
           });
           Navigator.pop(context);
         },
-        tileColor: _selectedIndex == 1 ? const Color.fromARGB(255, 23, 24, 28) : null, // Added blue color on select
+        tileColor: _selectedIndex == 1 ? const Color.fromARGB(255, 23, 24, 28) : null,
       ),
       const SizedBox(height: 10), // Added space before ListTiles
       ListTile(

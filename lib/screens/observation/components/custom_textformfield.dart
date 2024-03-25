@@ -72,18 +72,17 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
           readOnly: widget.isBoolean, // Add this line
           onTap: widget.isBoolean
               ? () {
-                  showDialog(
+                  showModalBottomSheet(
                     context: context,
                     builder: (BuildContext context) {
-                      return Dialog(
-          surfaceTintColor: const Color.fromARGB(255, 31, 33, 38),
-          backgroundColor: const Color.fromARGB(255, 31, 33, 38),
-          child: SizedBox(
-            width: 300,
-            height: 220,
+                      return 
+          Container(
+        padding: const EdgeInsets.all(8.0),
+        height: 250,
+        color: const Color.fromARGB(255, 31, 33, 38),
                       child:
                       Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
+                  padding: const EdgeInsets.only(top: 24.0),
                   child: 
                         Column(
                           mainAxisSize: MainAxisSize.min,
@@ -94,44 +93,51 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
                               'Select ${widget.labelText}',
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 20,
+                                fontSize: 18,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
                             const SizedBox(height: 8),
                             const Divider(color: Colors.white),
                             const SizedBox(height: 8),
-                            TextButton(
+                            Padding(padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                            child:
+                            InkWell(
+                              splashColor: Colors.transparent, // Removes the splash color
                               child: Text(
                                 'Yes',
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 18,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              onPressed: () {
+                              onTap: () {
                                 widget.onChanged('true');
                                 Navigator.of(context).pop();
                               },
                             ),
-                            const SizedBox(height: 8),
-                            TextButton(
+                            ),
+                            const SizedBox(height: 16),
+                            Padding(padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                            child:
+                            InkWell(
+                              splashColor: Colors.transparent, // Removes the splash color
                               child: Text(
                                 'No',
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 18,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              onPressed: () {
+                              onTap: () {
                                 widget.onChanged('false');
                                 Navigator.of(context).pop();
                               },
                             ),
+                            ),
                           ],
-                        ),
                         ),
                         ),
                       );

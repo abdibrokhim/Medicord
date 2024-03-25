@@ -28,7 +28,11 @@ StoreConnector<GlobalState, UserState>(
         converter: (store) => store.state.appState.userState,
         builder: (context, userState) {
 
-    return Center(
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      color: const Color.fromARGB(255, 31, 33, 38),
+      child: 
+    Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -39,26 +43,29 @@ StoreConnector<GlobalState, UserState>(
               backgroundImage: NetworkImage(photoUrl),
               radius: 50.0, // Size of the profile image
             ),
-            SizedBox(height: 10), // Spacing between elements
+            SizedBox(height: 16), // Spacing between elements
             Text(
               displayName,
               style: TextStyle(
+                color: Colors.white,
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 5), // Spacing between elements
+            SizedBox(height: 4), // Spacing between elements
             Text(
               email,
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.grey[600],
+                color: Colors.grey[300],
+                fontWeight: FontWeight.w700,
               ),
             ),
           ],
         ),
         Expanded(child: SizedBox(),),
           ]
+        ),
         ),
     );
 

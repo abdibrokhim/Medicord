@@ -635,8 +635,9 @@ CustomTextFormField(
           ElevatedButton(
   onPressed: _generateConclusion,
   style: ElevatedButton.styleFrom(
-    elevation: 5,
-    backgroundColor: Color(0xFF232428), // Set the background color
+    // elevation: 5,
+    surfaceTintColor: Colors.transparent,
+    backgroundColor: Colors.transparent,
     foregroundColor: Colors.white, // Set the text color (applies to foreground)
     textStyle: TextStyle(
       fontSize: 18,
@@ -645,6 +646,10 @@ CustomTextFormField(
     padding: EdgeInsets.symmetric(vertical: 16, horizontal: 40), // Set the padding
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.all(Radius.circular(5)), // Set the border radius
+      side: BorderSide(
+        color: Colors.white,
+        width: 2,
+      ),
     ),
   ),
   child: Text(
