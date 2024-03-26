@@ -1,4 +1,4 @@
-import 'package:brainmri/models/observation_mode.dart';
+import 'package:brainmri/models/observation_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 

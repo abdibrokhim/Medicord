@@ -1,4 +1,4 @@
-import 'package:brainmri/models/observation_mode.dart';
+import 'package:brainmri/models/observation_model.dart';
 import 'package:brainmri/models/patients_model.dart';
 import 'package:brainmri/screens/observation/single_observation_screen.dart';
 import 'package:brainmri/screens/user/user_reducer.dart';

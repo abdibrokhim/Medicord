@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:brainmri/auth/components/secure_storage.dart';
 import 'package:intl/intl.dart';
-import 'package:brainmri/models/observation_mode.dart';
+import 'package:brainmri/models/observation_model.dart';
 import 'package:brainmri/screens/user/user_reducer.dart';
 import 'package:brainmri/store/env.dart';
 import 'package:http/http.dart' as http;

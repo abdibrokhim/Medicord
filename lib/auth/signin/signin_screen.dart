@@ -1,6 +1,7 @@
 import 'package:brainmri/auth/components/cuctom_error_widget.dart';
 import 'package:brainmri/auth/signup/signup_screen.dart';
 import 'package:brainmri/screens/mainlayout/main_layout_screen.dart';
+import 'package:brainmri/screens/observation/components/custom_textformfield.dart';
 import 'package:brainmri/screens/user/user_reducer.dart';
 import 'package:brainmri/store/app_store.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -82,8 +83,17 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 31, 33, 38),
       appBar: AppBar(
-        title: const Text('Sign In'),
+        title: const Text(
+          'Sign In',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+        ),
+        backgroundColor: const Color.fromARGB(255, 23, 24, 28),
       ),
       body: StoreConnector<GlobalState, UserState>(
         converter: (store) => store.state.appState.userState,
@@ -100,46 +110,96 @@ class _SignInScreenState extends State<SignInScreen> {
                         errors: errors
                       ),
                       const SizedBox(height: 20,),
-                TextField(
-                  controller: _emailController,
-                  decoration: const InputDecoration(labelText: 'Email'),
-                  onChanged: (value) {
-                    if (value.isNotEmpty) {
-                      removeError(error: 'Email is required');
-                    }
-                  },
-                ),
-                TextField(
-                  controller: _passwordController,
-                  decoration: const InputDecoration(labelText: 'Password'),
-                  obscureText: true,
-                  onChanged: (value) {
-                    if (value.isNotEmpty) {
-                      removeError(error: 'Password is required');
-                    }
-                  },
-                ),
+
+                      CustomTextFormField(
+  labelText: 'Email',
+  isInputEmpty: _emailController.text.isEmpty,
+  onChanged: (value) => setState(() => _emailController.text = value),
+  onClear: () => setState(() => _emailController.text = ''),
+  initialValue: _emailController.text,
+),
+
                 const SizedBox(height: 20,),
+                      CustomTextFormField(
+  labelText: 'Password',
+  isInputEmpty: _passwordController.text.isEmpty,
+                  onChanged: (value) => setState(() => _passwordController.text = value),
+  onClear: () => setState(() => _passwordController.text = ''),
+  initialValue: _passwordController.text,
+),
+
+
+                const SizedBox(height: 60,),
+
+                SizedBox(
+                  width: double.infinity,
+                  child:
                 ElevatedButton(
-                  onPressed: _performLogin,
-                  child: const Text('Sign In'),
-                ),
+  onPressed: _performLogin,
+  style: ElevatedButton.styleFrom(
+    // elevation: 5,
+    surfaceTintColor: Colors.transparent,
+    backgroundColor: Colors.transparent, // Set the background color
+    foregroundColor: Colors.white, // Set the text color (applies to foreground)
+    textStyle: TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.w700, 
+    ),
+    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 40), // Set the padding
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(Radius.circular(5)), // Set the border radius
+            side: BorderSide(
+        color: Colors.white,
+        width: 2,
+      ),
+    ),
+  ),
+  child: Text(
+    'Sign In'
+  ),
+),
+),
                 const SizedBox(height: 20,),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    const Text('I don\'t have an account, lemme '),
-                    TextButton(
-                      onPressed: () {
+
+                Text("Don't have an account?", style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                ),),
+                const SizedBox(height: 20,),
+                                SizedBox(
+                  width: double.infinity,
+                  child:
+                ElevatedButton(
+                        onPressed: () {
                                                       Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => const SignUpScreen()),
                   );
                       },
-                      child: const Text('Sign Up'),
-                    ),
-                  ],
-                ),
+  style: ElevatedButton.styleFrom(
+    // elevation: 5,
+    surfaceTintColor: Colors.transparent,
+    backgroundColor: Colors.transparent, // Set the background color
+    foregroundColor: Colors.white, // Set the text color (applies to foreground)
+    textStyle: TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.w700, 
+    ),
+    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 40), // Set the padding
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(Radius.circular(5)), // Set the border radius
+            side: BorderSide(
+        color: Colors.white,
+        width: 2,
+      ),
+    ),
+  ),
+  child: Text(
+    'Sign Up'
+  ),
+),
+),
               ],
             ),
             ),

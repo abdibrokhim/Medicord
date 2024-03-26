@@ -1,6 +1,7 @@
-import 'package:brainmri/models/observation_mode.dart';
+import 'package:brainmri/models/observation_model.dart';
 import 'package:brainmri/models/patients_model.dart';
 import 'package:brainmri/screens/observation/components/observation_card.dart';
+import 'package:brainmri/screens/observation/components/single_observation_bottom_sheet.dart';
 import 'package:brainmri/screens/user/user_reducer.dart';
 import 'package:brainmri/store/app_store.dart';
 import 'package:brainmri/utils/refreshable.dart';
@@ -31,6 +32,10 @@ class _ObservationsScreenState extends State<ObservationsScreen> {
     observations = widget.observations;
   }
 
+  void showObservation(o) {
+    showObservationBottomSheet(context, o, "Brain MRI", widget.pId);
+  }
+
     TextEditingController conclusionController = TextEditingController();
 
   @override
@@ -38,6 +43,7 @@ class _ObservationsScreenState extends State<ObservationsScreen> {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 31, 33, 38),
       appBar: AppBar(
+        surfaceTintColor: const Color.fromARGB(255, 23, 24, 28),
         backgroundColor: const Color.fromARGB(255, 23, 24, 28),
         title: const Text(
           'Observations',
@@ -73,6 +79,9 @@ class _ObservationsScreenState extends State<ObservationsScreen> {
         radiologistName: observations[index].radiologistName!,
         labelText: "Brain MRI",
         isApproved: observations[index].conclusion!.isApproved!,
+        onTap: () {
+          showObservation(observations[index]);
+        },
       );
     },
   ),

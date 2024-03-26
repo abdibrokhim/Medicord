@@ -34,6 +34,7 @@ class _MainLayoutState extends State<MainLayout> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        surfaceTintColor: const Color.fromARGB(255, 23, 24, 28),
         iconTheme: IconThemeData(color: Colors.white),
         title: Text(_tabTitles[_selectedIndex],
             style: const TextStyle(

@@ -1,7 +1,8 @@
 import 'package:brainmri/models/conclusion_model.dart';
-import 'package:brainmri/models/observation_mode.dart';
+import 'package:brainmri/models/observation_model.dart';
 import 'package:brainmri/screens/observation/brain/brain_observation_model.dart';
 import 'package:brainmri/screens/observation/components/custom_dropdown.dart';
+import 'package:brainmri/screens/observation/components/custom_text_field.dart';
 import 'package:brainmri/screens/observation/components/custom_textformfield.dart';
 import 'package:brainmri/screens/observation/components/template.dart';
 import 'package:brainmri/screens/user/user_reducer.dart';
@@ -21,34 +22,118 @@ class BrainObservationForm extends StatefulWidget {
 
 class _BrainObservationFormState extends State<BrainObservationForm> {
   final BrainObservationModel observation = BrainObservationModel();
+  final TextEditingController radiologistNameController = TextEditingController();
 
-  String radiologistName = '';
-
-  void showDialoga() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Radiologist Name'),
-          content: TextField(
-            onChanged: (value) => setState(() => radiologistName = value),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: _submitForm,
-              child: const Text('Submit'),
-            ),
-          ],
-        );
-      },
+int calculateLines(String text) {
+    final TextSpan span = TextSpan(text: text);
+    final TextPainter tp = TextPainter(
+      text: span,
+      maxLines: null,
+      textDirection: TextDirection.ltr,
     );
+    tp.layout(maxWidth: MediaQuery.of(context).size.width);
+    print(tp.computeLineMetrics().length);
+    return tp.computeLineMetrics().length;
   }
+
+  void showSubmitBottomSheet(BuildContext context, String conclusion) {
+
+  showModalBottomSheet(
+    isScrollControlled: true,
+    context: context,
+    builder: (BuildContext context) {
+      return Container(
+        height: 800,
+        padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+        color: const Color.fromARGB(255, 31, 33, 38),
+        child: SingleChildScrollView(
+          child:
+        Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 24.0),
+            Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Text(
+                              'Save observation and conclusion',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+      Container(
+        alignment: Alignment.center,
+        height: 35,
+        width: 35,
+        decoration: BoxDecoration(
+          color: Color.fromARGB(200, 255, 255, 255), // Add your background color here
+          shape: BoxShape.circle,
+        ),
+        child: IconButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          icon: Icon(Icons.close, color: Colors.black, size: 18,),
+        ),
+      ),
+    ],
+),
+          
+const SizedBox(height: 32.0),
+
+CustomTextField(
+  labelText: 'Conclusion',
+  initialValue: conclusion,
+  maxLines: calculateLines(conclusion),
+),
+const SizedBox(height: 24.0),
+CustomTextFormField(
+  labelText: 'Radiologist Name',
+  isInputEmpty: radiologistNameController.text.isEmpty,
+  onChanged: (value) => setState(() => radiologistNameController.text = value),
+  onClear: () => setState(() => radiologistNameController.text = ''),
+  initialValue: radiologistNameController.text,
+),
+  const SizedBox(height: 32.0),
+
+  SizedBox(
+                  width: double.infinity,
+                  child:
+          ElevatedButton(
+  onPressed: _submitForm,
+  style: ElevatedButton.styleFrom(
+    elevation: 5,
+    surfaceTintColor: Colors.transparent,
+    backgroundColor: Colors.transparent,
+    foregroundColor: Colors.white, // Set the text color (applies to foreground)
+    textStyle: TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.w700, 
+    ),
+    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 40), // Set the padding
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(Radius.circular(5)), // Set the border radius
+            side: BorderSide(
+        color: Colors.white,
+        width: 2,
+      ),
+    ),
+  ),
+  child: Text(
+    'Submit'
+  ),
+),
+),
+          ],
+        ),
+        ),
+      );
+    },
+  );
+}
 
   void _submitForm() {
 
@@ -65,7 +150,7 @@ class _BrainObservationFormState extends State<BrainObservationForm> {
         isApproved: false,
       ),
       text: state.observationString,
-      radiologistName: radiologistName,
+      radiologistName: radiologistNameController.text,
       observedAt: DateTime.now(),
     );
 
@@ -79,59 +164,67 @@ class _BrainObservationFormState extends State<BrainObservationForm> {
   void _generateConclusion() {
     print('generate conclusion');
 
+    showSubmitBottomSheet(context, 
+      """
+this is really long text
+this is really long text
+this is really long text
+this is really long text
+""");
 
-    print('observation: ${observation.toJson()}');
 
-    String observationString = fillObservationTemplate(observation);
+//     print('observation: ${observation.toJson()}');
+
+//     String observationString = fillObservationTemplate(observation);
     
-    // Below template, for testing purposes only
-    // ------------ //
-//     String observationString = """
-// - Scanning Technique: T1 FSE-sagittal, T2 FLAIR, T2 FSE-axial, T2 FSE-coronal
-// - Basal Ganglia:
-//   - Location: Usually located
-//   - Symmetry: Symmetrical
-//   - Contour: Clear, even contours
-//   - Dimensions: Not changed
-//   - MR Signal: Not changed
-// - Brain Grooves and Ventricles:
-//   - Lateral Ventricles Width: Right: 7 mm, Left: 9 mm
-//   - Third Ventricle Width: 4 mm
-//   - Sylvian Aqueduct: Not changed
-//   - Fourth Ventricle: Tent-shaped and not dilated
-// - Brain Structures:
-//   - Corpus Callosum: Normal shape and size
-//   - Brain Stem: Without features
-//   - Cerebellum: Normal shape
-//   - Craniovertebral Junction: Unchanged
-//   - Pituitary Gland: Normal shape, height 4 mm in sagittal projection
-// - Optic Nerves and Orbital Structures:
-//   - Orbital Cones Shape: Unchanged
-//   - Eyeballs Shape and Size: Spherical and normal size
-//   - Optic Nerves Diameter: Preserved
-//   - Extraocular Muscles: Normal size, without pathological signals
-//   - Retrobulbar Fatty Tissue: Without pathological signals
-// - Paranasal Sinuses:
-//   - Cysts Presence: Not mentioned
-//   - Cysts Size: Not mentioned
-//   - Sinuses Pneumatization: Usually pneumatized
-// - Additional Observations: None mentioned
-// """;
-// ------------ //
+//     // Below template, for testing purposes only
+//     // ------------ //
+// //     String observationString = """
+// // - Scanning Technique: T1 FSE-sagittal, T2 FLAIR, T2 FSE-axial, T2 FSE-coronal
+// // - Basal Ganglia:
+// //   - Location: Usually located
+// //   - Symmetry: Symmetrical
+// //   - Contour: Clear, even contours
+// //   - Dimensions: Not changed
+// //   - MR Signal: Not changed
+// // - Brain Grooves and Ventricles:
+// //   - Lateral Ventricles Width: Right: 7 mm, Left: 9 mm
+// //   - Third Ventricle Width: 4 mm
+// //   - Sylvian Aqueduct: Not changed
+// //   - Fourth Ventricle: Tent-shaped and not dilated
+// // - Brain Structures:
+// //   - Corpus Callosum: Normal shape and size
+// //   - Brain Stem: Without features
+// //   - Cerebellum: Normal shape
+// //   - Craniovertebral Junction: Unchanged
+// //   - Pituitary Gland: Normal shape, height 4 mm in sagittal projection
+// // - Optic Nerves and Orbital Structures:
+// //   - Orbital Cones Shape: Unchanged
+// //   - Eyeballs Shape and Size: Spherical and normal size
+// //   - Optic Nerves Diameter: Preserved
+// //   - Extraocular Muscles: Normal size, without pathological signals
+// //   - Retrobulbar Fatty Tissue: Without pathological signals
+// // - Paranasal Sinuses:
+// //   - Cysts Presence: Not mentioned
+// //   - Cysts Size: Not mentioned
+// //   - Sinuses Pneumatization: Usually pneumatized
+// // - Additional Observations: None mentioned
+// // """;
+// // ------------ //
 
-    print('observationString: $observationString');
+//     print('observationString: $observationString');
 
-    print('saving observation');
+//     print('saving observation');
 
-    StoreProvider.of<GlobalState>(context).dispatch(
-      SaveObservationAction(observationString),
-    );
+//     StoreProvider.of<GlobalState>(context).dispatch(
+//       SaveObservationAction(observationString),
+//     );
 
-    print('generating conclusion');
+//     print('generating conclusion');
     
-    StoreProvider.of<GlobalState>(context).dispatch(
-      GenerateConclusionAction(observationString),
-    );
+//     StoreProvider.of<GlobalState>(context).dispatch(
+//       GenerateConclusionAction(observationString),
+//     );
   }
 
   List<String> errors = [];
@@ -267,6 +360,7 @@ class _BrainObservationFormState extends State<BrainObservationForm> {
               flex: 2,
               child: 
       CustomDropdownWithSearch( 
+        labelText: "Select or add patient",
           items: userState.patientNames,
           itemName: 'Select',
           dState: 0
@@ -586,6 +680,7 @@ const SizedBox(height: 14.0),
   onClear: () => setState(() => observation.sinusesCystsPresence = false),
   initialValue: observation.sinusesCystsPresence ? 'Yes' : 'No',
   isBoolean: true,
+  isReadOnly: true,
 ),
 const SizedBox(height: 14.0),
 CustomTextFormField(
@@ -632,6 +727,9 @@ CustomTextFormField(
 ],),
 
           const SizedBox(height: 24.0),
+                          SizedBox(
+                  width: double.infinity,
+                  child:
           ElevatedButton(
   onPressed: _generateConclusion,
   style: ElevatedButton.styleFrom(
@@ -656,34 +754,13 @@ CustomTextFormField(
     userState.conclusion.isEmpty ? 'Generate' : 'Regenerate'
   ),
 ),
-
-
-          if (userState.conclusion.isNotEmpty)
+),
+          if (!userState.conclusion.isNotEmpty)
           Column(children: [
+  const SizedBox(height: 24.0),
             Text(
               'Conclusion:\n${userState.conclusion}'
             ),
-
-          const SizedBox(height: 16.0),
-          ElevatedButton(
-  onPressed: showDialoga,
-  style: ElevatedButton.styleFrom(
-    elevation: 5,
-    backgroundColor: Color(0xFF232428), // Set the background color
-    foregroundColor: Colors.white, // Set the text color (applies to foreground)
-    textStyle: TextStyle(
-      fontSize: 18,
-      fontWeight: FontWeight.w700, 
-    ),
-    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 40), // Set the padding
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.all(Radius.circular(5)), // Set the border radius
-    ),
-  ),
-  child: Text(
-    'Submit'
-  ),
-),
           ],)
         ],
       ),

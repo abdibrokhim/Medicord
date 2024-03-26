@@ -10,12 +10,14 @@ class CustomDropdownWithSearch extends StatefulWidget {
   final List<Map<String, String>> items;
   final String itemName;
   final int dState;
+  final String labelText;
 
   const CustomDropdownWithSearch({
     Key? key,
     required this.items,
     required this.itemName,
     required this.dState,
+    required this.labelText,
   }) : super(key: key);
 
   @override
@@ -115,15 +117,46 @@ class _CustomDropdownWithSearchState extends State<CustomDropdownWithSearch> {
   List<String> filteredItems = widget.items.map((e) => e['name']!).toList();
 
   showModalBottomSheet(
+    isScrollControlled: true,
     context: context,
     builder: (BuildContext context) {
       return Container(
-        padding: const EdgeInsets.all(8.0),
-        height: 500,
+        padding: const EdgeInsets.all(16.0),
+        height: 800,
         color: const Color.fromARGB(255, 31, 33, 38),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            const SizedBox(height: 8),
+             Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+                            Text(
+                              widget.labelText,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+      Container(
+        alignment: Alignment.center,
+        height: 35,
+        width: 35,
+        decoration: BoxDecoration(
+          color: Color.fromARGB(200, 255, 255, 255), // Add your background color here
+          shape: BoxShape.circle,
+        ),
+        child: IconButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          icon: Icon(Icons.close, color: Colors.black, size: 18,),
+        ),
+      ),
+    ],
+),
+const SizedBox(height: 8),
             TextField(
               cursorColor: Colors.white,
               controller: searchController,

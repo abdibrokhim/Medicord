@@ -1,5 +1,5 @@
+import 'package:brainmri/utils/shared.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 
 class ObservationCard extends StatelessWidget {
@@ -7,6 +7,7 @@ class ObservationCard extends StatelessWidget {
   final String radiologistName;
   final String labelText;
   final bool isApproved;
+  final Function() onTap;
 
   const ObservationCard({
     Key? key,
@@ -14,21 +15,14 @@ class ObservationCard extends StatelessWidget {
     required this.radiologistName,
     this.labelText = "Brain MRI",
     required this.isApproved,
+    required this.onTap,
   }) : super(key: key);
-
-
-String formatDate(DateTime date) {
-  final DateFormat formatter = DateFormat('d MMMM, yyyy');
-  return formatter.format(date);
-}
 
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        onTap : () {
-          print("Tapped");
-        },
+        onTap: onTap,
         child: 
     Column(
       children: [
@@ -103,7 +97,7 @@ String formatDate(DateTime date) {
                 child: Padding(padding: const EdgeInsets.only(right: 8),
       child:
                 Text(
-                    isApproved ? "approved" : "not approved",
+                    isApproved ? "approved" : "pending",
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.white,

@@ -1,9 +1,13 @@
-import 'package:brainmri/models/observation_mode.dart';
+import 'package:brainmri/models/observation_model.dart';
 import 'package:brainmri/models/patients_model.dart';
+import 'package:brainmri/screens/observation/components/custom_text_field.dart';
+import 'package:brainmri/screens/observation/components/custom_textformfield.dart';
 import 'package:brainmri/screens/user/user_reducer.dart';
 import 'package:brainmri/store/app_store.dart';
 import 'package:brainmri/utils/refreshable.dart';
+import 'package:brainmri/utils/shared.dart';
 import 'package:flutter/material.dart';
+
 
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -11,241 +15,371 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
 
 
-class ObservationsScreen extends StatefulWidget {
-  final String pId;
-  final List<ObservationModel> observations;
 
-  const ObservationsScreen({Key? key, required this.pId, required this.observations}) : super(key: key);
-
-  @override
-  State<ObservationsScreen> createState() => _ObservationsScreenState();
-}
-
-class _ObservationsScreenState extends State<ObservationsScreen> {
-  late List<ObservationModel> observations;
-
-  @override
-  void initState() {
-    super.initState();
-    observations = widget.observations;
+  int calculateLines(BuildContext context, String text) {
+    final TextSpan span = TextSpan(text: text);
+    final TextPainter tp = TextPainter(
+      text: span,
+      maxLines: null,
+      textDirection: TextDirection.ltr,
+    );
+    tp.layout(maxWidth: MediaQuery.of(context).size.width);
+    print(tp.computeLineMetrics().length);
+    return tp.computeLineMetrics().length;
   }
 
-    String headDoctorName = '';
-    String obId = '';
+  void showObservationBottomSheet(BuildContext context, ObservationModel observation, String labelText, String pId) {
 
-    void showDialoga() {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Head Doctor Name'),
-            content: TextField(
-              onChanged: (value) => setState(() => headDoctorName = value),
-            ),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: _submitForm,
-                child: const Text('Approve'),
-              ),
-            ],
-          );
-        },
-      );
-    }
-
-    void _submitForm() {
-
-      var state = StoreProvider.of<GlobalState>(context).state.appState.userState;
-
-      StoreProvider.of<GlobalState>(context).dispatch(
-        ApprovePatientConclusionAction(widget.pId, obId, headDoctorName),
-      );
-
-      Navigator.of(context).pop();
-    }
-
-    void showDialogb() {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Approved'),
-            content: Text('This observation has already been approved.'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('Cancel'),
-              ),
-            ],
-          );
-        },
-      );
-    }
-
-  
-
-    TextEditingController conclusionController = TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 31, 33, 38),
-      appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 23, 24, 28),
-        title: const Text(
-          'Observations',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
+  showModalBottomSheet(
+    isScrollControlled: true,
+    context: context,
+    builder: (BuildContext context) {
+      return Container(
+        height: 800,
+        padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+        color: const Color.fromARGB(255, 31, 33, 38),
+        child: 
+        Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 24.0),
+         Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Text(
+        labelText,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
         ),
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            color: Colors.white,),
+      ),
+      Container(
+        alignment: Alignment.center,
+        height: 35,
+        width: 35,
+        decoration: BoxDecoration(
+          color: Color.fromARGB(200, 255, 255, 255), // Add your background color here
+          shape: BoxShape.circle,
+        ),
+        child: IconButton(
           onPressed: () {
             Navigator.of(context).pop();
           },
+          icon: Icon(Icons.close, color: Colors.black, size: 20),
         ),
       ),
-      body: 
-      Padding(padding: 
-      const EdgeInsets.all(20),
-      child:
-      SingleChildScrollView(
-  scrollDirection: Axis.vertical,
-  child: SingleChildScrollView(
-    scrollDirection: Axis.horizontal,
-        child: 
-        DataTable(
-          decoration: const BoxDecoration(
-            color: Color.fromARGB(255, 255, 255, 255),
-          ),
-          columns: const [
-            DataColumn(label: Text('Observation')),
-            DataColumn(label: Text('Observed At')),
-            DataColumn(label: Text('Radiologist Name')),
-            DataColumn(label: Text('Conclusion')),
-            DataColumn(label: Text('Approved')),
+    ],
+),
+                            // const Divider(color: Colors.white),
+const SizedBox(height: 32.0),
+Expanded(
+              child: 
+ ListView(
+          children: [
+
+CustomTextField(
+  labelText: 'Observation',
+  initialValue: observation.text!,
+  maxLines: calculateLines(context, observation.text!),
+),
+const SizedBox(height: 24.0),
+CustomTextField(
+  labelText: 'Conclusion',
+  initialValue: observation.conclusion!.text!,
+  maxLines: calculateLines(context, observation.conclusion!.text!),
+),
+const SizedBox(height: 24.0),
+CustomTextField(
+  labelText: 'Radiologist',
+  initialValue: observation.radiologistName!,
+  maxLines: calculateLines(context, observation.radiologistName!),
+),
+const SizedBox(height: 24.0),
+CustomTextField(
+  labelText: 'Observed on',
+  initialValue: formatDate(observation.observedAt!),
+  maxLines: 1
+),
+const SizedBox(height: 24.0),
+CustomTextField(
+  labelText: 'Status',
+  initialValue: observation.conclusion!.isApproved! ? 'Approved' : 'Pending',
+  maxLines: 1,
+  onTap: () {
+    showConfirmationBottomSheet(context, observation, pId);
+  },
+),
+
+  const SizedBox(height: 32.0),
+
+  SizedBox(
+                  width: double.infinity,
+                  child:
+          ElevatedButton(
+  onPressed: () =>
+    showReportActionBottomSheet(context),
+  style: ElevatedButton.styleFrom(
+    elevation: 5,
+    surfaceTintColor: Colors.transparent,
+    backgroundColor: Colors.transparent,
+    foregroundColor: Colors.white, // Set the text color (applies to foreground)
+    textStyle: TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.w700, 
+    ),
+    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 40), // Set the padding
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(Radius.circular(5)), // Set the border radius
+            side: BorderSide(
+        color: Colors.white,
+        width: 2,
+      ),
+    ),
+  ),
+  child: Text(
+    'Generate Report',
+  ),
+),
+),
+const SizedBox(height: 60.0),
           ],
-          rows: observations
-              .map(
-                (observation) => DataRow(cells: [
-                  DataCell(InkWell(
-                    onTap: () => showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text('Observation'),
-                          content: SingleChildScrollView(
-  scrollDirection: Axis.vertical,
-  child:Text(observation.text!),
-                          ),
-                          actions: <Widget>[
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text('Close'),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                    child:
-                    Text(
-                    observation.text!,
-                    overflow: TextOverflow.ellipsis,
-                  )),
-                  ),
-                  DataCell(Text(observation.observedAt!.toString())),
-                  DataCell(Text(observation.radiologistName!)),
-                  DataCell(
-                   InkWell(
-  onTap: () => showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      bool isEdited = false;
-      TextEditingController conclusionController = TextEditingController(text: observation.conclusion!.text!);
-
-      return StatefulBuilder(
-        builder: (context, setState) {
-          return AlertDialog(
-            title: const Text('Conclusion'),
-            content: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: TextField(
-                controller: conclusionController,
-                onChanged: (value) {
-                  setState(() {
-                    isEdited = value != observation.conclusion!.text!;
-                  });
-                },
-              ),
-            ),
-            actions: <Widget>[
-              if (isEdited)
-                ElevatedButton(
-                  onPressed: () {
-                    print('update conclusion');
-
-                    StoreProvider.of<GlobalState>(context).dispatch(
-                      UpdatePatientConclusion(
-                        widget.pId,
-                        observation.id!,
-                        conclusionController.text,
-                      ),
-                    );
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('Save'),
-                ),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('Close'),
-              ),
-            ],
-          );
-        },
+),
+ ),
+          ],
+        ),
       );
     },
-  ),
-  child: Text(observation.conclusion!.text!),
-),
-),
+  );
+}
 
-                  DataCell(
-                    IconButton(
-                      icon: observation.conclusion!.isApproved! ? 
-                      const Icon(Icons.check_circle_outline) :
-                      const Icon(Icons.cancel_outlined),
-                      onPressed: () {
-                        setState(() {
-                          obId = observation.id!;
-                        });
-                        !observation.conclusion!.isApproved! ? 
-                        showDialoga() : showDialogb();
-                      },
-                    ),
-                  ),
-                ]),
-              )
-              .toList(),
+  void showConfirmationBottomSheet(BuildContext context, ObservationModel observation, String pId) {
+
+    final bool isApproved = observation.conclusion!.isApproved!;
+    final TextEditingController _dController = TextEditingController();
+    
+    _dController.text = isApproved ? observation.conclusion!.headDoctorName! : '';
+
+  showModalBottomSheet(
+    isScrollControlled: true,
+                    context: context,
+                    builder: (BuildContext context) {
+                      return 
+          Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        height: 400,
+        color: const Color.fromARGB(255, 31, 33, 38),
+                      child:
+                      Padding(
+                  padding: const EdgeInsets.only(top: 24.0),
+                  child: 
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+                            Text(
+                              'Approve Observation',
+                              maxLines: 2,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+      Container(
+        alignment: Alignment.center,
+        height: 35,
+        width: 35,
+        decoration: BoxDecoration(
+          color: Color.fromARGB(200, 255, 255, 255), // Add your background color here
+          shape: BoxShape.circle,
+        ),
+        child: IconButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          icon: Icon(Icons.close, color: Colors.black, size: 18,),
         ),
       ),
+    ],
+),
+const SizedBox(height: 16),
+                      Text(
+                        isApproved ? 'Observation is already approved.' :
+                              'You are about to approve the observation. Make sure the observation is correct and the conclusion is accurate.',
+                              maxLines: 2,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            CustomTextFormField(
+  labelText: 'Head Doctor Name',
+  isInputEmpty: _dController.text.isEmpty,
+  onChanged: (value) => _dController.text = value,
+  onClear: () => _dController.text = '',
+  initialValue: _dController.text,
+  isReadOnly: isApproved
+),
+
+const SizedBox(height: 32.0),
+
+isApproved ? const SizedBox() :
+
+  SizedBox(
+                  width: double.infinity,
+                  child:
+          ElevatedButton(
+  onPressed: () {
+                                    if (!observation.conclusion!.isApproved!) {
+      StoreProvider.of<GlobalState>(context).dispatch(
+        ApprovePatientConclusionAction(pId, observation.id!, _dController.text),
+      );
+    }
+  },
+  style: ElevatedButton.styleFrom(
+    elevation: 5,
+    surfaceTintColor: Colors.transparent,
+    backgroundColor: Colors.transparent,
+    foregroundColor: Colors.white, // Set the text color (applies to foreground)
+    textStyle: TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.w700, 
+    ),
+    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 40), // Set the padding
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(Radius.circular(5)), // Set the border radius
+            side: BorderSide(
+        color: Colors.white,
+        width: 2,
       ),
-      ),
-    );
+    ),
+  ),
+  child: Text(
+    'Approve',
+  ),
+),
+),
+                          ],
+                        ),
+                        ),
+                      );
+                    },
+                  );
   }
-}
+  void showReportActionBottomSheet(BuildContext context) {
+
+    var state = StoreProvider.of<GlobalState>(context).state.appState.userState;
+
+    String path = state.reportPath;
+
+  showModalBottomSheet(
+    isScrollControlled: true,
+                    context: context,
+                    builder: (BuildContext context) {
+                      return 
+          Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        height: 400,
+        color: const Color.fromARGB(255, 31, 33, 38),
+                      child:
+                      Padding(
+                  padding: const EdgeInsets.only(top: 24.0),
+                  child: 
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+                            Text(
+                              'Share or Download Report',
+                              maxLines: 2,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+      Container(
+        alignment: Alignment.center,
+        height: 35,
+        width: 35,
+        decoration: BoxDecoration(
+          color: Color.fromARGB(200, 255, 255, 255), // Add your background color here
+          shape: BoxShape.circle,
+        ),
+        child: IconButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          icon: Icon(Icons.close, color: Colors.black, size: 18,),
+        ),
+      ),
+    ],
+),
+const SizedBox(height: 16),
+                      Text(
+                              'You may share the report with the patient or download it.',
+                              maxLines: 2,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+const SizedBox(height: 32.0),
+
+  SizedBox(
+                  width: double.infinity,
+                  child:
+          ElevatedButton(
+  onPressed: () async {
+    if (path.isNotEmpty) {
+    StoreProvider.of<GlobalState>(context).dispatch(
+        DownloadReportAction(path),
+      );
+    } else {
+      print('No report to download.');
+    }
+  },
+  style: ElevatedButton.styleFrom(
+    elevation: 5,
+    surfaceTintColor: Colors.transparent,
+    backgroundColor: Colors.transparent,
+    foregroundColor: Colors.white, // Set the text color (applies to foreground)
+    textStyle: TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.w700, 
+    ),
+    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 40), // Set the padding
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(Radius.circular(5)), // Set the border radius
+            side: BorderSide(
+        color: Colors.white,
+        width: 2,
+      ),
+    ),
+  ),
+  child: Text(
+    'Download',
+  ),
+),
+),
+                          ],
+                        ),
+                        ),
+                      );
+                    },
+                  );
+  }

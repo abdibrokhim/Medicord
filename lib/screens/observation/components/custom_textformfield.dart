@@ -7,7 +7,9 @@ class CustomTextFormField extends StatefulWidget {
   final void Function()? onClear;
   final String initialValue;
   final int minLines;
+  final int maxLines;
   final bool isBoolean;
+  final bool isReadOnly;
 
   const CustomTextFormField({
     Key? key,
@@ -17,7 +19,9 @@ class CustomTextFormField extends StatefulWidget {
     this.onClear,
     required this.initialValue,
     this.minLines = 1,
+    this.maxLines = 4,
     this.isBoolean = false,
+    this.isReadOnly = false,
   }) : super(key: key);
 
   @override
@@ -69,7 +73,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
         ),
         SizedBox(height: 8), // Spacing between label text and TextFormField
         TextFormField(
-          readOnly: widget.isBoolean, // Add this line
+          readOnly: widget.isReadOnly, // Add this line
           onTap: widget.isBoolean
               ? () {
                   showModalBottomSheet(
@@ -77,7 +81,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
                     builder: (BuildContext context) {
                       return 
           Container(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
         height: 250,
         color: const Color.fromARGB(255, 31, 33, 38),
                       child:
@@ -89,23 +93,41 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
                             Text(
                               'Select ${widget.labelText}',
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 18,
+                                fontSize: 20,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
-                            const SizedBox(height: 8),
-                            const Divider(color: Colors.white),
-                            const SizedBox(height: 8),
+      Container(
+        alignment: Alignment.center,
+        height: 35,
+        width: 35,
+        decoration: BoxDecoration(
+          color: Color.fromARGB(200, 255, 255, 255), // Add your background color here
+          shape: BoxShape.circle,
+        ),
+        child: IconButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          icon: Icon(Icons.close, color: Colors.black, size: 18,),
+        ),
+      ),
+    ],
+),
+                            const SizedBox(height: 24),
                             Padding(padding: const EdgeInsets.symmetric(horizontal: 16.0),
                             child:
                             InkWell(
                               splashColor: Colors.transparent, // Removes the splash color
                               child: Text(
-                                'Yes',
+                                'Yes (there is a presence of cysts)',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 16,
@@ -118,13 +140,13 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
                               },
                             ),
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 24),
                             Padding(padding: const EdgeInsets.symmetric(horizontal: 16.0),
                             child:
                             InkWell(
                               splashColor: Colors.transparent, // Removes the splash color
                               child: Text(
-                                'No',
+                                'No (there is no presence of cysts)',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 16,
@@ -146,7 +168,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
                 }
               : null,
           minLines: widget.minLines,
-          maxLines: 4,
+          maxLines: widget.maxLines,
           cursorColor: Colors.black,
           controller: _controller,
           style: TextStyle(
@@ -171,7 +193,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
               ),
               borderRadius: BorderRadius.circular(5.0),
             ),
-            suffixIcon: widget.isInputEmpty ? null : IconButton(
+            suffixIcon: widget.isReadOnly ? null : widget.isInputEmpty ? null : IconButton(
               onPressed: _clearTextField,
               icon: const Icon(Icons.close, color: Colors.black),
             ),

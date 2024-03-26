@@ -47,6 +47,7 @@ class _AddObservationScreenState extends State<AddObservationScreen> {
                           flex: 2,
               child: 
                   CustomDropdownWithSearch( 
+                    labelText: "Select scan type",
           items: [
             {'name': 'Brain', 'id': '1'},
           ],
