@@ -500,6 +500,103 @@ UserState downloadReportResponseReducer(UserState state, DownloadReportResponse 
 
 
 
+
+// ========== simulations ========== //
+
+class SimulateGenerateConclusionAction {
+
+  SimulateGenerateConclusionAction();
+}
+
+UserState simulateGenerateConclusionReducer(UserState state, SimulateGenerateConclusionAction action) {
+  return state.copyWith(isGeneratingConclusion: true);
+}
+
+class SimulateGenerateConclusionResponseAction {
+  final String conclusion;
+
+  SimulateGenerateConclusionResponseAction(this.conclusion);
+}
+
+UserState simulateGenerateConclusionResponseReducer(UserState state, SimulateGenerateConclusionResponseAction action) {
+  print('conclusion: ${action.conclusion}');
+  
+  return state.copyWith(
+    isGeneratingConclusion: false,
+    conclusion: action.conclusion,
+  );
+}
+
+
+class SimulateSavePatientObservationAction {
+  SimulateSavePatientObservationAction();
+}
+
+class SimulateSavePatientObservationResponseAction {
+  SimulateSavePatientObservationResponseAction();
+}
+
+UserState simulateSavePatientObservationReducer(UserState state, SimulateSavePatientObservationAction action) {
+  return state.copyWith(isSavingObservation: true);
+}
+
+UserState simulateSavePatientObservationResponseReducer(UserState state, SimulateSavePatientObservationResponseAction action) {
+  return state.copyWith(
+    isSavingObservation: false,
+  );
+}
+
+
+class SimulateApprovePatientConclusionAction {
+  SimulateApprovePatientConclusionAction();
+}
+
+class SimulateApprovePatientConclusionResponseAction {
+  SimulateApprovePatientConclusionResponseAction();
+}
+
+UserState simulateApprovePatientConclusionReducer(UserState state, SimulateApprovePatientConclusionAction action) {
+  return state.copyWith(isApprovingConclusion: true);
+}
+
+UserState simulateApprovePatientConclusionResponseReducer(UserState state, SimulateApprovePatientConclusionResponseAction action) {
+  return state.copyWith(isApprovingConclusion: false);
+}
+
+class SimulateGenerateReport {
+  SimulateGenerateReport();
+}
+
+class SimulateGenerateReportResponse {
+  SimulateGenerateReportResponse();
+}
+
+UserState simulateGenerateReportReducer(UserState state, SimulateGenerateReport action) {
+  return state.copyWith(isGeneratingReport: true);
+}
+
+UserState simulateGenerateReportResponseReducer(UserState state, SimulateGenerateReportResponse action) {
+  return state.copyWith(isGeneratingReport: false);
+}
+
+class SimulateDownloadReport {
+  SimulateDownloadReport();
+}
+
+class SimulateDownloadReportResponse {
+  SimulateDownloadReportResponse();
+}
+
+UserState simulateDownloadReportReducer(UserState state, SimulateDownloadReport action) {
+  return state.copyWith(isDownloadingReport: true);
+}
+
+UserState simulateDownloadReportResponseReducer(UserState state, SimulateDownloadReportResponse action) {
+  return state.copyWith(isDownloadingReport: false);
+}
+
+
+
 // ========== Combine all reducers ========== //
 
 Reducer<UserState> userReducer = combineReducers<UserState>([
@@ -532,5 +629,16 @@ Reducer<UserState> userReducer = combineReducers<UserState>([
   TypedReducer<UserState, GenerateReportResponse>(generateReportResponseReducer),
   TypedReducer<UserState, DownloadReportAction>(downloadReportReducer),
   TypedReducer<UserState, DownloadReportResponse>(downloadReportResponseReducer),
-
+  
+  //==== simulations for testing purposes only ====//
+  TypedReducer<UserState, SimulateGenerateConclusionAction>(simulateGenerateConclusionReducer),
+  TypedReducer<UserState, SimulateGenerateConclusionResponseAction>(simulateGenerateConclusionResponseReducer),
+  TypedReducer<UserState, SimulateSavePatientObservationAction>(simulateSavePatientObservationReducer),
+  TypedReducer<UserState, SimulateSavePatientObservationResponseAction>(simulateSavePatientObservationResponseReducer),
+  TypedReducer<UserState, SimulateApprovePatientConclusionAction>(simulateApprovePatientConclusionReducer),
+  TypedReducer<UserState, SimulateApprovePatientConclusionResponseAction>(simulateApprovePatientConclusionResponseReducer),
+  TypedReducer<UserState, SimulateGenerateReport>(simulateGenerateReportReducer),
+  TypedReducer<UserState, SimulateGenerateReportResponse>(simulateGenerateReportResponseReducer),
+  TypedReducer<UserState, SimulateDownloadReport>(simulateDownloadReportReducer),
+  TypedReducer<UserState, SimulateDownloadReportResponse>(simulateDownloadReportResponseReducer),
 ]);

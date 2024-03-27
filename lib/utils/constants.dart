@@ -15,9 +15,14 @@ Map<String, Color> colors = {
 };
 
 
+// Colors
+
 Color primaryBgColor = Color(0x313338);
 Color secondaryBgColor = Color(0x404249);
 Color accentBgColor = Color.fromARGB(255, 23, 24, 28);
 Color primaryInputFieldTextColor = Color(0x000000);
 Color secondaryInputFieldTextColor = Color(0xDDDDDD);
 Color inputFieldColor = Color(0xC3C3C3);
+Color errorInputFieldColor = Color(0xFFFFCBCB);
+Color mentionInputFieldColor = Color(0xFFFFEDCB);
+Color infoInputFieldColor = Color(0xFFCBF3FF);

@@ -9,6 +9,8 @@ import 'package:brainmri/screens/user/user_reducer.dart';
 import 'package:brainmri/store/app_logs.dart';
 import 'package:brainmri/store/app_store.dart';
 import 'package:brainmri/utils/refreshable.dart';
+import 'package:brainmri/utils/shared.dart';
+import 'package:brainmri/utils/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
@@ -23,6 +25,33 @@ class BrainObservationForm extends StatefulWidget {
 class _BrainObservationFormState extends State<BrainObservationForm> {
   final BrainObservationModel observation = BrainObservationModel();
   final TextEditingController radiologistNameController = TextEditingController();
+  final TextEditingController newPatientNameController = TextEditingController();
+  final TextEditingController birthYearController = TextEditingController();
+
+  List<String> errors = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    initErrors();
+  }
+
+
+  void addError({required String error}) {
+    if (!errors.contains(error)) {
+      setState(() {
+        errors.add(error);
+      });
+    }
+  }
+
+  void initErrors() {
+    setState(() {
+      errors = [];
+    });
+  }
+
 
 int calculateLines(String text) {
     final TextSpan span = TextSpan(text: text);
@@ -32,17 +61,105 @@ int calculateLines(String text) {
       textDirection: TextDirection.ltr,
     );
     tp.layout(maxWidth: MediaQuery.of(context).size.width);
-    print(tp.computeLineMetrics().length);
+    print('maxlines: ${tp.computeLineMetrics().length}');
     return tp.computeLineMetrics().length;
   }
 
-  void showSubmitBottomSheet(BuildContext context, String conclusion) {
+  void fillErrorList() {
+  // Reinitialize errors
+  initErrors();
+
+  // Add errors to list
+  if (observation.scanningTechnique.isEmpty) {
+    addError(error: 'Scanning technique is required');
+  }
+
+  if (observation.basalGangliaLocation.isEmpty) {
+    addError(error: 'Basal ganglia location is required');
+  }
+
+  if (observation.basalGangliaSymmetry.isEmpty) {
+    addError(error: 'Basal ganglia symmetry is required');
+  }
+
+  if (observation.basalGangliaContour.isEmpty) {
+    addError(error: 'Basal ganglia contour is required');
+  }
+
+  if (observation.basalGangliaDimensions.isEmpty) {
+    addError(error: 'Basal ganglia dimensions are required');
+  }
+
+  if (observation.basalGangliaSignal.isEmpty) {
+    addError(error: 'Basal ganglia signal is required');
+  }
+
+  if (observation.sylvianAqueductCondition.isEmpty) {
+    addError(error: 'Sylvian aqueduct condition is required');
+  }
+
+  if (observation.fourthVentricleCondition.isEmpty) {
+    addError(error: 'Fourth ventricle condition is required');
+  }
+
+  if (observation.corpusCallosumCondition.isEmpty) {
+    addError(error: 'Corpus callosum condition is required');
+  }
+
+  if (observation.brainStemCondition.isEmpty) {
+    addError(error: 'Brain stem condition is required');
+  }
+
+  if (observation.cerebellumCondition.isEmpty) {
+    addError(error: 'Cerebellum condition is required');
+  }
+
+  if (observation.craniovertebralJunctionCondition.isEmpty) {
+    addError(error: 'Craniovertebral junction condition is required');
+  }
+
+  if (observation.pituitaryGlandCondition.isEmpty) {
+    addError(error: 'Pituitary gland condition is required');
+  }
+
+  if (observation.orbitalConesShape.isEmpty) {
+    addError(error: 'Orbital cones shape is required');
+  }
+
+  if (observation.eyeballsShapeSize.isEmpty) {
+    addError(error: 'Eyeballs shape and size are required');
+  }
+
+  if (observation.extraocularMusclesCondition.isEmpty) {
+    addError(error: 'Extraocular muscles condition is required');
+  }
+
+  if (observation.retrobulbarFattyTissueCondition.isEmpty) {
+    addError(error: 'Retrobulbar fatty tissue condition is required');
+  }
+
+  if (observation.sinusesPneumatization.isEmpty) {
+    addError(error: 'Sinuses pneumatization is required');
+  }
+
+}
+
+
+  void showSubmitBottomSheet(BuildContext context) {
 
   showModalBottomSheet(
     isScrollControlled: true,
     context: context,
     builder: (BuildContext context) {
-      return Container(
+      return 
+      StoreConnector<GlobalState, UserState>(
+      onInit: (store) {
+        // store.dispatch(FetchAllPatientNamesAction());
+      },
+      converter: (appState) => appState.state.appState.userState,
+      builder: (context, userState) {
+        return
+      Container(
         height: 800,
         padding: const EdgeInsets.only(left: 16.0, right: 16.0),
         color: const Color.fromARGB(255, 31, 33, 38),
@@ -84,11 +201,40 @@ int calculateLines(String text) {
           
 const SizedBox(height: 32.0),
 
+userState.isGeneratingConclusion ?
+  const Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+          'Conclusion',
+          style: TextStyle(
+            color: Color(0xFFDDDDDD), // Label text color
+            fontSize: 16, // Adjust the font size as needed
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      const SizedBox(height: 8.0),
+  CircularProgressIndicator(
+    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF232428)), // Change the progress color
+    backgroundColor: Color(0xFFC3C3C3), // Change the background color
+  ),
+      const SizedBox(height: 8.0),
+          Text(
+            'Generating conclusion. Please wait...',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+    ],
+  ) :
 CustomTextField(
   labelText: 'Conclusion',
-  initialValue: conclusion,
-  maxLines: calculateLines(conclusion),
+  initialValue: userState.conclusion,
+  maxLines: calculateLines(userState.conclusion) == 0 ? 1 : calculateLines(userState.conclusion),
 ),
+
 const SizedBox(height: 24.0),
 CustomTextFormField(
   labelText: 'Radiologist Name',
@@ -102,8 +248,9 @@ CustomTextFormField(
   SizedBox(
                   width: double.infinity,
                   child:
+
           ElevatedButton(
-  onPressed: _submitForm,
+  onPressed: (userState.isGeneratingConclusion || userState.isSavingObservation) ? () {} : _submitForm,
   style: ElevatedButton.styleFrom(
     elevation: 5,
     surfaceTintColor: Colors.transparent,
@@ -122,7 +269,13 @@ CustomTextFormField(
       ),
     ),
   ),
-  child: Text(
+  child: 
+    userState.isSavingObservation ? 
+      CircularProgressIndicator(
+    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF232428)), // Change the progress color
+    backgroundColor: Color(0xFFC3C3C3), // Change the background color
+  ) :
+  Text(
     'Submit'
   ),
 ),
@@ -132,45 +285,207 @@ CustomTextFormField(
         ),
       );
     },
+    );
+  }
+  );
+}
+
+  void showAddNewPatientBottomSheet(BuildContext context) {
+
+  showModalBottomSheet(
+    isScrollControlled: true,
+    context: context,
+    builder: (BuildContext context) {
+      return 
+      StoreConnector<GlobalState, UserState>(
+      onInit: (store) {
+      },
+      converter: (appState) => appState.state.appState.userState,
+      builder: (context, userState) {
+        return
+      Container(
+        height: 600,
+        padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+        color: const Color.fromARGB(255, 31, 33, 38),
+        child: SingleChildScrollView(
+          child:
+        Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 24.0),
+            Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Text(
+                              'Add new patient',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+      Container(
+        alignment: Alignment.center,
+        height: 35,
+        width: 35,
+        decoration: BoxDecoration(
+          color: Color.fromARGB(200, 255, 255, 255), // Add your background color here
+          shape: BoxShape.circle,
+        ),
+        child: IconButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          icon: Icon(Icons.close, color: Colors.black, size: 18,),
+        ),
+      ),
+    ],
+),
+          
+const SizedBox(height: 32.0),
+
+CustomTextFormField(
+  labelText: 'Patient name (ex: John Doe)',
+  isInputEmpty: newPatientNameController.text.isEmpty,
+  onChanged: (value) => setState(() => newPatientNameController.text = value),
+  onClear: () => setState(() => newPatientNameController.text = ''),
+  initialValue: newPatientNameController.text,
+),
+  const SizedBox(height: 24.0),
+CustomTextFormField(
+  labelText: 'Birth year (ex: 1990)',
+  isInputEmpty: birthYearController.text.isEmpty,
+  onChanged: (value) => setState(() => birthYearController.text = value),
+  onClear: () => setState(() => birthYearController.text = ''),
+  initialValue: birthYearController.text,
+),
+  const SizedBox(height: 32.0),
+
+  SizedBox(
+                  width: double.infinity,
+                  child:
+
+          ElevatedButton(
+  onPressed: (userState.isSavingNewPatient) ? () {} : () {
+                StoreProvider.of<GlobalState>(context).dispatch(
+                  SaveNewPatientAction(newPatientNameController.text, birthYearController.text),
+                );
+  },
+  style: ElevatedButton.styleFrom(
+    elevation: 5,
+    surfaceTintColor: Colors.transparent,
+    backgroundColor: Colors.transparent,
+    foregroundColor: Colors.white, // Set the text color (applies to foreground)
+    textStyle: TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.w700, 
+    ),
+    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 40), // Set the padding
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(Radius.circular(5)), // Set the border radius
+            side: BorderSide(
+        color: Colors.white,
+        width: 2,
+      ),
+    ),
+  ),
+  child: 
+    userState.isSavingNewPatient ? 
+      CircularProgressIndicator(
+    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF232428)), // Change the progress color
+    backgroundColor: Color(0xFFC3C3C3), // Change the background color
+  ) :
+  Text(
+    'Save'
+  ),
+),
+),
+          ],
+        ),
+        ),
+      );
+    },
+    );
+  }
   );
 }
 
   void _submitForm() {
 
-    print(observation.toJson());
-    
+    // simulate submit form
+
+    print('submitting form');
+
+    if (radiologistNameController.text.isEmpty) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            showToast(message: 'Radiologist name required.', bgColor: Colors.red[900]);
+          });
+          return;
+        } else {
+
     var state = StoreProvider.of<GlobalState>(context).state.appState.userState;
 
-    final ObservationModel newOb = ObservationModel(
-      conclusion: ConclusionModel(
-        text: state.conclusion,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-        isValidated: true,
-        isApproved: false,
-      ),
-      text: state.observationString,
-      radiologistName: radiologistNameController.text,
-      observedAt: DateTime.now(),
-    );
 
     StoreProvider.of<GlobalState>(context).dispatch(
-      SavePatientObservationAction(state.selectedPatient['id']! , newOb),
+      SimulateSavePatientObservationAction(),
     );
+        }
 
-    Navigator.of(context).pop();
+
+
+    // print(observation.toJson());
+
+
+    // if (!isSubmitFormValid(state.observationString, state.conclusion)) {
+    //   return;
+    // }
+
+    // final ObservationModel newOb = ObservationModel(
+    //   conclusion: ConclusionModel(
+    //     text: state.conclusion,
+    //     createdAt: DateTime.now(),
+    //     updatedAt: DateTime.now(),
+    //     isValidated: true,
+    //     isApproved: false,
+    //   ),
+    //   text: state.observationString,
+    //   radiologistName: radiologistNameController.text,
+    //   observedAt: DateTime.now(),
+    // );
+
+    // StoreProvider.of<GlobalState>(context).dispatch(
+    //   SavePatientObservationAction(state.selectedPatient['id']! , newOb),
+    // );
+
+    // Navigator.of(context).pop();
   }
+
+
+  //   bool isSubmitFormValid(String observationString, String conclusion) {
+  //   if (observationString.isEmpty) {
+  //     addError(error: 'Observation is required');
+  //     return false;
+  //   } else {
+  //     removeError(error: 'Observation is required');
+  //   }
+
+  //   if (conclusion.isEmpty) {
+  //     addError(error: 'Conclusion is required');
+  //     return false;
+  //   } else {
+  //     removeError(error: 'Conclusion is required');
+  //   }
+
+  //   return true;
+  // }
+
 
   void _generateConclusion() {
     print('generate conclusion');
 
-    showSubmitBottomSheet(context, 
-      """
-this is really long text
-this is really long text
-this is really long text
-this is really long text
-""");
+
+
 
 
 //     print('observation: ${observation.toJson()}');
@@ -223,44 +538,34 @@ this is really long text
 //     print('generating conclusion');
     
 //     StoreProvider.of<GlobalState>(context).dispatch(
-//       GenerateConclusionAction(observationString),
+      // GenerateConclusionAction(observationString),
 //     );
+
+fillErrorList();
+
+if (errors.isNotEmpty) {
+  showErrorBottomSheet(context, errors);
+} else {
+
+    StoreProvider.of<GlobalState>(context).dispatch(
+      SimulateGenerateConclusionAction(),
+    );
+
+    showSubmitBottomSheet(context);
+
+}
+
+
+    // // delay to allow the conclusion to be generated
+    // Future.delayed(const Duration(seconds: 5), () {
+    // if (StoreProvider.of<GlobalState>(context).state.appState.userState.conclusion.isNotEmpty) {
+    // } else {
+    //   print('conclusion is empty');
+    // }
+    // });
+
+  
   }
-
-  List<String> errors = [];
-
-  @override
-  void initState() {
-    super.initState();
-
-    initErrors();
-  }
-
-
-  void addError({required String error}) {
-    if (!errors.contains(error)) {
-      setState(() {
-        errors.add(error);
-      });
-    }
-  }
-
-  void removeError({required String error}) {
-    if (errors.contains(error)) {
-      setState(() {
-        errors.remove(error);
-      });
-    }
-  }
-
-  void initErrors() {
-    setState(() {
-      errors = [];
-    });
-  }
-
-  String? name;
-  DateTime? bDate;
 
   bool other = false;
 
@@ -308,40 +613,6 @@ this is really long text
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const SizedBox(height: 16),
-
-                                if (userState.isSavingNewPatient)
-                        const Column(
-                          children: [
-                            LinearProgressIndicator(),
-                            Padding(padding: EdgeInsets.only(left:16.0, right:16.0),
-                              child: 
-                                Text('Saving new patient. Please wait...'),
-                            ),
-                          ],
-                        ),
-                                if (userState.isSavingObservation)
-                        const Column(
-                          children: [
-                            LinearProgressIndicator(),
-                            Padding(padding: EdgeInsets.only(left:16.0, right:16.0),
-                              child: 
-                                Text('Saving new observation. Please wait...'),
-                            ),
-                          ],
-                        ),
-                                if (userState.isGeneratingConclusion)
-                        const Column(
-                          children: [
-                            LinearProgressIndicator(),
-                            Padding(padding: EdgeInsets.only(left:16.0, right:16.0),
-                              child: 
-                                Text('Generating conclusion. Please wait...'),
-                            ),
-                          ],
-                        ),
-                        
-                        const SizedBox(height: 16),
-
                         Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -363,72 +634,17 @@ this is really long text
         labelText: "Select or add patient",
           items: userState.patientNames,
           itemName: 'Select',
-          dState: 0
+          dState: 0,
+          isAddNewPatient: true,
+          onAddNewPatient: () {
+            showAddNewPatientBottomSheet(context);
+          },
         ),
         ),
         ],
       ),
-ListTile(
-  title: const Text('Other'),
-  leading: Checkbox(
-    value: other,
-    onChanged: (bool? value) {
-      setState(() {
-        bDate = null;
-        other = value!;
-      });
-    },
-  ),
-),
 
-        other ?
-        Column(children: [
-          Row(
-            children: [
-Expanded(child: 
-    TextField(
-      decoration: const InputDecoration(labelText: 'Patient name'),
-      onChanged: (value) => setState(() => name = value),
-    ),
-),
-
-const SizedBox(width: 16.0),
-    // Date of birth
-Expanded(child: 
-    TextButton(
-      onPressed: () async {
-        final DateTime? picked = await showDatePicker(
-          context: context,
-          initialDate: DateTime.now(),
-          firstDate: DateTime(1900),
-          lastDate: DateTime.now(),
-        );
-        if (picked != null && picked != bDate)
-          setState(() {
-            bDate = picked;
-          });
-      },
-      child: Text(bDate != null ? bDate!.toIso8601String().split('T')[0] : 'Select date of birth'),
-    ),
-    ),
-          ],),
-
-      const SizedBox(height: 16.0),
-
-          ElevatedButton(
-            onPressed: () {
-              AppLog.log().i('name: $name, bDate: $bDate');
-
-              if (name != null && bDate != null) {
-                String bYear = bDate!.year.toString();
-                StoreProvider.of<GlobalState>(context).dispatch(
-                  SaveNewPatientAction(name!, bYear),
-                );
-              }
-            },
-            child: Text('Save patient'),
-            )
-        ],) : Container(),
+      const SizedBox(height: 24.0),
 
 CustomTextFormField(
   labelText: 'Scanning Technique',
@@ -723,6 +939,7 @@ CustomTextFormField(
   onClear: () => setState(() => observation.additionalObservations = ''),
   initialValue: observation.additionalObservations,
   minLines: 4,
+  maxLines: 4,
 ),
 ],),
 
@@ -755,13 +972,6 @@ CustomTextFormField(
   ),
 ),
 ),
-          if (!userState.conclusion.isNotEmpty)
-          Column(children: [
-  const SizedBox(height: 24.0),
-            Text(
-              'Conclusion:\n${userState.conclusion}'
-            ),
-          ],)
         ],
       ),
       ),

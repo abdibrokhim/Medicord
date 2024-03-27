@@ -1,9 +1,9 @@
-import 'package:brainmri/auth/components/cuctom_error_widget.dart';
 import 'package:brainmri/auth/signup/signup_screen.dart';
 import 'package:brainmri/screens/mainlayout/main_layout_screen.dart';
 import 'package:brainmri/screens/observation/components/custom_textformfield.dart';
 import 'package:brainmri/screens/user/user_reducer.dart';
 import 'package:brainmri/store/app_store.dart';
+import 'package:brainmri/utils/shared.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -29,25 +29,9 @@ class _SignInScreenState extends State<SignInScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  void _performLogin() async {
-    print('Performing login.');
+  bool showOnce = true;
 
-    if (_emailController.text.isEmpty) {
-      addError(error: 'Email is required');
-      return;
-    }
-
-    if (_passwordController.text.isEmpty) {
-      addError(error: 'Password is required');
-      return;
-    }
-
-    StoreProvider.of<GlobalState>(context).dispatch(
-      LoginAction(_emailController.text, _passwordController.text),
-    );
-  }
-
-  List<String> errors = [];
+    List<String> errors = [];
 
   @override
   void initState() {
@@ -64,21 +48,42 @@ class _SignInScreenState extends State<SignInScreen> {
     }
   }
 
-  void removeError({required String error}) {
-    if (errors.contains(error)) {
-      setState(() {
-        errors.remove(error);
-      });
-    }
-  }
-
   void initErrors() {
     setState(() {
       errors = [];
     });
   }
 
-  bool showOnce = true;
+
+  void fillErrorList() {
+  // Reinitialize errors
+  initErrors();
+
+  // Add errors
+  if (_emailController.text.isEmpty) {
+    addError(error: 'Email is required');
+  }
+
+  if (_passwordController.text.isEmpty) {
+    addError(error: 'Password is required');
+  }
+
+  }
+
+  void _performLogin() async {
+    print('Performing login.');
+    
+    fillErrorList();
+    
+    if (errors.isNotEmpty) {
+  showErrorBottomSheet(context, errors);
+} else {
+
+    StoreProvider.of<GlobalState>(context).dispatch(
+      LoginAction(_emailController.text, _passwordController.text),
+    );
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -105,10 +110,6 @@ class _SignInScreenState extends State<SignInScreen> {
             Column(
               children: [
                       const SizedBox(height: 20,),
-                                  if (errors.isNotEmpty)
-                      CustomErrorWidget(
-                        errors: errors
-                      ),
                       const SizedBox(height: 20,),
 
                       CustomTextFormField(
@@ -126,6 +127,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   onChanged: (value) => setState(() => _passwordController.text = value),
   onClear: () => setState(() => _passwordController.text = ''),
   initialValue: _passwordController.text,
+  obscureText: true
 ),
 
 

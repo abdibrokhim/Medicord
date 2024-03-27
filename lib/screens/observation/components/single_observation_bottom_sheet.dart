@@ -6,6 +6,7 @@ import 'package:brainmri/screens/user/user_reducer.dart';
 import 'package:brainmri/store/app_store.dart';
 import 'package:brainmri/utils/refreshable.dart';
 import 'package:brainmri/utils/shared.dart';
+import 'package:brainmri/utils/toast.dart';
 import 'package:flutter/material.dart';
 
 
@@ -34,7 +35,14 @@ import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
     isScrollControlled: true,
     context: context,
     builder: (BuildContext context) {
-      return Container(
+      return StoreConnector<GlobalState, UserState>(
+      onInit: (store) {
+        store.dispatch(FetchAllPatientNamesAction());
+      },
+      converter: (appState) => appState.state.appState.userState,
+      builder: (context, userState) {
+        return
+      Container(
         height: 800,
         padding: const EdgeInsets.only(left: 16.0, right: 16.0),
         color: const Color.fromARGB(255, 31, 33, 38),
@@ -118,8 +126,14 @@ CustomTextField(
                   width: double.infinity,
                   child:
           ElevatedButton(
-  onPressed: () =>
-    showReportActionBottomSheet(context),
+  onPressed: () {
+
+    StoreProvider.of<GlobalState>(context).dispatch(
+        SimulateGenerateReport(),
+      );
+
+    showReportActionBottomSheet(context);
+  },
   style: ElevatedButton.styleFrom(
     elevation: 5,
     surfaceTintColor: Colors.transparent,
@@ -153,19 +167,31 @@ const SizedBox(height: 60.0),
     },
   );
 }
+  );
+}
+
 
   void showConfirmationBottomSheet(BuildContext context, ObservationModel observation, String pId) {
 
-    final bool isApproved = observation.conclusion!.isApproved!;
+    final bool isApproved = !observation.conclusion!.isApproved!;
     final TextEditingController _dController = TextEditingController();
     
     _dController.text = isApproved ? observation.conclusion!.headDoctorName! : '';
+
+    bool loading = false;
 
   showModalBottomSheet(
     isScrollControlled: true,
                     context: context,
                     builder: (BuildContext context) {
                       return 
+                      StoreConnector<GlobalState, UserState>(
+      onInit: (store) {
+        // store.dispatch(FetchAllPatientNamesAction());
+      },
+      converter: (appState) => appState.state.appState.userState,
+      builder: (context, userState) {
+        return
           Container(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         height: 400,
@@ -237,12 +263,28 @@ isApproved ? const SizedBox() :
                   width: double.infinity,
                   child:
           ElevatedButton(
-  onPressed: () {
-                                    if (!observation.conclusion!.isApproved!) {
+  onPressed: userState.isApprovingConclusion ? () {} : () async {
+print('Approving conclusion...');
+    //                                 if (!isApproved) {
+    //   StoreProvider.of<GlobalState>(context).dispatch(
+    //     ApprovePatientConclusionAction(pId, observation.id!, _dController.text),
+    //   );
+    // }
+
+        // simulate download
+
+        if (_dController.text.isEmpty) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            showToast(message: 'Head Doctor name required.', bgColor: Colors.red[900]);
+          });
+          return;
+        } else {
+
       StoreProvider.of<GlobalState>(context).dispatch(
-        ApprovePatientConclusionAction(pId, observation.id!, _dController.text),
-      );
-    }
+          SimulateApprovePatientConclusionAction(),
+        );
+        }
+
   },
   style: ElevatedButton.styleFrom(
     elevation: 5,
@@ -262,8 +304,14 @@ isApproved ? const SizedBox() :
       ),
     ),
   ),
-  child: Text(
-    'Approve',
+  child: 
+    userState.isApprovingConclusion ? 
+      CircularProgressIndicator(
+    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF232428)), // Change the progress color
+    backgroundColor: Color(0xFFC3C3C3), // Change the background color
+  ) :
+  Text(
+    'Approve'
   ),
 ),
 ),
@@ -273,7 +321,13 @@ isApproved ? const SizedBox() :
                       );
                     },
                   );
-  }
+                    },
+  );
+}
+
+
+
+
   void showReportActionBottomSheet(BuildContext context) {
 
     var state = StoreProvider.of<GlobalState>(context).state.appState.userState;
@@ -285,6 +339,13 @@ isApproved ? const SizedBox() :
                     context: context,
                     builder: (BuildContext context) {
                       return 
+                      StoreConnector<GlobalState, UserState>(
+      onInit: (store) {
+        // store.dispatch();
+      },
+      converter: (appState) => appState.state.appState.userState,
+      builder: (context, userState) {
+        return
           Container(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         height: 400,
@@ -338,20 +399,48 @@ const SizedBox(height: 16),
                               ),
                             ),
                             const SizedBox(height: 24),
-const SizedBox(height: 32.0),
+
+userState.isGeneratingReport ?
+  const Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const SizedBox(height: 8.0),
+  CircularProgressIndicator(
+    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF232428)), // Change the progress color
+    backgroundColor: Color(0xFFC3C3C3), // Change the background color
+  ),
+      const SizedBox(height: 8.0),
+          Text(
+            'Generating report. Please wait...',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+  SizedBox(height: 32,),
+    ],
+  ) : SizedBox(height: 32,),
+
 
   SizedBox(
                   width: double.infinity,
                   child:
           ElevatedButton(
-  onPressed: () async {
-    if (path.isNotEmpty) {
+  onPressed: (userState.isGeneratingReport || userState.isDownloadingReport) ? () {} : () async {
+    
+    // if (path.isNotEmpty) {
+    // StoreProvider.of<GlobalState>(context).dispatch(
+    //     DownloadReportAction(path),
+    //   );
+    // } else {
+    //   print('No report to download.');
+    // }
+
+    // simulate download
     StoreProvider.of<GlobalState>(context).dispatch(
-        DownloadReportAction(path),
+        SimulateDownloadReport(),
       );
-    } else {
-      print('No report to download.');
-    }
   },
   style: ElevatedButton.styleFrom(
     elevation: 5,
@@ -371,7 +460,12 @@ const SizedBox(height: 32.0),
       ),
     ),
   ),
-  child: Text(
+  child: userState.isDownloadingReport ? 
+    CircularProgressIndicator(
+    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF232428)), // Change the progress color
+    backgroundColor: Color(0xFFC3C3C3), // Change the background color
+  ) :
+  Text(
     'Download',
   ),
 ),
@@ -382,4 +476,6 @@ const SizedBox(height: 32.0),
                       );
                     },
                   );
+                    },
+  );
   }

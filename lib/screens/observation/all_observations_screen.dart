@@ -48,74 +48,6 @@ class _AllObservationsScreenState extends State<AllObservationsScreen> {
     _refreshController.loadComplete();
   }
 
-    void _showDialogr(PatientModel patient) {
-
-    print('_showDialogr patient: ${patient.fullName}');
-
-
-      var state = StoreProvider.of<GlobalState>(context).state.appState.userState;
-
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Report'),
-            content: Text('Are you sure you want to generate report?'),
-            actions: <Widget>[
-                      if (state.isGeneratingReport)
-                        const Column(
-                          children: [
-                            LinearProgressIndicator(),
-                            Padding(padding: EdgeInsets.only(left:16.0, right:16.0),
-                              child: 
-                                Text('Generating Report. Please wait...'),
-                            ),
-                          ],
-                        ),
-if (state.reportPath.isNotEmpty)
-  TextButton(
-    onPressed: () async {
-      String path = state.reportPath;
-      print('path: $path');
-
-                  StoreProvider.of<GlobalState>(context).dispatch(
-        DownloadReportAction(path),
-      );
-    },
-    child: const Text('Download Report'),
-  ),
-
-  const SizedBox(height: 16.0),
-
-  Row(
-    children: [
-Expanded(child: 
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('Cancel'),
-              ),
-),
-Expanded(child: 
-              TextButton(
-                onPressed: () {
-                             StoreProvider.of<GlobalState>(context).dispatch(
-        GenerateReportAction(patient),
-      );
-                },
-                child: const Text('Generate'),
-              ),
-              ),
-    ],
-  )
-
-            ],
-          );
-        },
-      );
-    }
-
 
   @override
   Widget build(BuildContext context) {
@@ -135,7 +67,26 @@ Expanded(child:
         
         return
         userState.patientsList.isEmpty ? 
-        const Center(child: CircularProgressIndicator()) :
+        const Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: [
+      const SizedBox(height: 8.0),
+  CircularProgressIndicator(
+    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF232428)), // Change the progress color
+    backgroundColor: Color(0xFFC3C3C3), // Change the background color
+  ),
+      const SizedBox(height: 16.0),
+          Text(
+            'Fetching data...',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+    ],
+  ) :
 
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),

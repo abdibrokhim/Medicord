@@ -2,6 +2,8 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:brainmri/auth/components/secure_storage.dart';
+import 'package:brainmri/utils/toast.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:brainmri/models/observation_model.dart';
 import 'package:brainmri/screens/user/user_reducer.dart';
@@ -421,6 +423,76 @@ static Future<void> downloadFile(String reportUrl) async {
 
   } catch (e) {
     print('Error while downloading file: $e');
+  }
+}
+
+
+
+
+//==== simulations for testing purposes only ====//
+
+static Future<String> simulateGen() async {
+  try {
+    print('Simulating generating conclusion');
+
+    await Future.delayed(Duration(seconds: 4));
+
+    showToast(message: 'Conclusion generated successfully', bgColor: Colors.green);
+
+    return 'This is a simulated conclusion';
+
+  } catch (e) {
+    return Future.error('Failed to simulate generating conclusion: $e');
+  }
+}
+
+
+static Future<void> simulateS() async {
+  try {
+    print('Simulating submission');
+
+    await Future.delayed(Duration(seconds: 4));
+
+    showToast(message: 'Observation submitted successfully', bgColor: Colors.green);
+
+  } catch (e) {
+    return Future.error('Failed to simulate generating conclusion: $e');
+  }
+}
+static Future<void> simulateA() async {
+  try {
+    print('Simulating submission');
+
+    await Future.delayed(Duration(seconds: 4));
+
+    showToast(message: 'Observation approved successfully', bgColor: Colors.green);
+
+  } catch (e) {
+    return Future.error('Failed to simulate generating conclusion: $e');
+  }
+}
+static Future<void> simulateD() async {
+  try {
+    print('Simulating submission');
+
+    await Future.delayed(Duration(seconds: 4));
+
+    showToast(message: 'Report downloaded successfully', bgColor: Colors.green);
+
+  } catch (e) {
+    return Future.error('Failed to simulate generating conclusion: $e');
+  }
+}
+static Future<void> simulateR() async {
+  try {
+    print('Simulating submission');
+
+    await Future.delayed(Duration(seconds: 4));
+
+    showToast(message: 'Report generated successfully', bgColor: Colors.green);
+
+  } catch (e) {
+    return Future.error('Failed to simulate generating conclusion: $e');
   }
 }
 

@@ -10,6 +10,7 @@ class CustomTextFormField extends StatefulWidget {
   final int maxLines;
   final bool isBoolean;
   final bool isReadOnly;
+  final bool obscureText;
 
   const CustomTextFormField({
     Key? key,
@@ -19,9 +20,10 @@ class CustomTextFormField extends StatefulWidget {
     this.onClear,
     required this.initialValue,
     this.minLines = 1,
-    this.maxLines = 4,
+    this.maxLines = 1,
     this.isBoolean = false,
     this.isReadOnly = false,
+    this.obscureText = false,
   }) : super(key: key);
 
   @override
@@ -73,6 +75,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
         ),
         SizedBox(height: 8), // Spacing between label text and TextFormField
         TextFormField(
+          obscureText: widget.obscureText,
           readOnly: widget.isReadOnly, // Add this line
           onTap: widget.isBoolean
               ? () {

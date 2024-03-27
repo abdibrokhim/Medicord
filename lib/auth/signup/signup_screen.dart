@@ -1,8 +1,8 @@
-import 'package:brainmri/auth/components/cuctom_error_widget.dart';
 import 'package:brainmri/screens/mainlayout/main_layout_screen.dart';
 import 'package:brainmri/screens/observation/components/custom_textformfield.dart';
 import 'package:brainmri/screens/user/user_reducer.dart';
 import 'package:brainmri/store/app_store.dart';
+import 'package:brainmri/utils/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
@@ -23,26 +23,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  void _performSignUp() {
-        if (_emailController.text.isEmpty) {
-      addError(error: 'Email is required');
-      return;
-    }
-    if (_passwordController.text.isEmpty) {
-      addError(error: 'Password is required');
-      return;
-    }
-
-    if (_nameController.text.isEmpty) {
-      addError(error: 'Nmae is required');
-      return;
-    }
-    StoreProvider.of<GlobalState>(context).dispatch(
-      SignUpAction(_nameController.text, _emailController.text, _passwordController.text),
-    );
-  }
-
-    List<String> errors = [];
+  List<String> errors = [];
 
   @override
   void initState() {
@@ -60,19 +41,45 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
-  void removeError({required String error}) {
-    if (errors.contains(error)) {
-      setState(() {
-        errors.remove(error);
-      });
-    }
-  }
-
   void initErrors() {
     setState(() {
       errors = [];
     });
   }
+
+  void fillErrorList() {
+  // Reinitialize errors
+  initErrors();
+
+  // Add errors
+  if (_nameController.text.isEmpty) {
+    addError(error: 'Company Name is required');
+  }
+
+  if (_emailController.text.isEmpty) {
+    addError(error: 'Email is required');
+  }
+
+  if (_passwordController.text.isEmpty) {
+    addError(error: 'Password is required');
+  }
+
+  }
+
+
+  void _performSignUp() {
+
+    fillErrorList();
+    
+    if (errors.isNotEmpty) {
+  showErrorBottomSheet(context, errors);
+} else {
+
+    StoreProvider.of<GlobalState>(context).dispatch(
+      SignUpAction(_nameController.text, _emailController.text, _passwordController.text),
+    );
+  }
+} 
 
   @override
   Widget build(BuildContext context) {
@@ -116,10 +123,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
         Column(
           children: [
                                   const SizedBox(height: 20,),
-                                  if (errors.isNotEmpty)
-                      CustomErrorWidget(
-                        errors: errors
-                      ),
                       const SizedBox(height: 20,),
                       CustomTextFormField(
   labelText: 'Company Name',
@@ -143,6 +146,7 @@ const SizedBox(height: 20,),
                   onChanged: (value) => setState(() => _passwordController.text = value),
   onClear: () => setState(() => _passwordController.text = ''),
   initialValue: _passwordController.text,
+  obscureText: true
 ),
             const SizedBox(height: 60,),
             SizedBox(

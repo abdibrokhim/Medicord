@@ -38,9 +38,9 @@ class FirebaseAuthService {
 
         if (!isAlreadySaved) {
           await saveOrganizationToRealtimeDatabase(user.uid, email ?? '');
-          showToast(message: 'Successfully saved organization to Realtime Database', bgColor: colors['success']!, webBgColor: "green");
+          showToast(message: 'Successfully saved organization to Realtime Database', bgColor: colors['success']!,);
         } else {
-          showToast(message: 'Organization is already saved to Realtime Database', bgColor: colors['success']!, webBgColor: "green");
+          showToast(message: 'Organization is already saved to Realtime Database', bgColor: colors['success']!, );
         }
 
         await StorageService.storeAccess(user.uid);
@@ -48,7 +48,7 @@ class FirebaseAuthService {
 
         return user;
       } else {
-        showToast(message: 'Error while signing in with google. Please try to sign in entering username and password', bgColor: colors['error']!, webBgColor: "red");
+        showToast(message: 'Error while signing in with google. Please try to sign in entering username and password', bgColor: colors['error']!,);
         return Future.error('Error while signing in with google');
       }
     } catch (e) {
