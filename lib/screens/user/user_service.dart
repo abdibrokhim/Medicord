@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:brainmri/auth/components/secure_storage.dart';
+import 'package:brainmri/utils/constants.dart';
 import 'package:brainmri/utils/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -166,6 +167,7 @@ class UserService {
 
       String? organizationId = await _getOrganizationId();
       if (organizationId == null) {
+        showToast(message: 'No organization found', bgColor: getColor(AppColors.error));
         return Future.error('No organization ID found');
       }
 
@@ -174,11 +176,13 @@ class UserService {
 
       if (!snapshot.exists) {
         // If patient does not exist, return an error
+        showToast(message: 'No patient found', bgColor: getColor(AppColors.error));
         return Future.error('Patient with ID $patientId does not exist');
       } else {
         print('snapshot.value: ${snapshot.value}');
         // If patient exists, add a new observation under the patient record with a unique ID
         DatabaseReference observationRef = patientRef.child('observations').push();  // Generate a unique ID for the new observation
+        showToast(message: 'Observation saved successfully', bgColor: getColor(AppColors.success));
         await observationRef.set(observationModel.toJson());
       }
     } catch (e) {
@@ -194,6 +198,8 @@ class UserService {
       AppLog.log().i('Saving new patient: $fullName, $birthYear');
 
       if (organizationId == null) {
+        showToast(message: 'No organization ID found', bgColor: Colors.red[900]);
+
         return Future.error('No organization ID found');
       }
       DatabaseReference patientsRef = _firebaseDatabase.ref().child('organizations').child(organizationId).child('patients').push();
@@ -202,8 +208,11 @@ class UserService {
         'birthYear': birthYear,
       });
 
+      showToast(message: 'New patient saved', bgColor: Colors.green[900]);
+
       AppLog.log().i('New patient saved');
     } catch (e) {
+      showToast(message: 'An error has occured', bgColor: Colors.red[900]);
       return Future.error('Error while saving new patient: $e');
     }
   }
@@ -437,7 +446,7 @@ static Future<String> simulateGen() async {
 
     await Future.delayed(Duration(seconds: 4));
 
-    showToast(message: 'Conclusion generated successfully', bgColor: Colors.green);
+    showToast(message: 'Conclusion generated successfully', bgColor: Colors.green[900]);
 
     return 'This is a simulated conclusion';
 
@@ -453,7 +462,7 @@ static Future<void> simulateS() async {
 
     await Future.delayed(Duration(seconds: 4));
 
-    showToast(message: 'Observation submitted successfully', bgColor: Colors.green);
+    showToast(message: 'Observation submitted successfully', bgColor: Colors.green[900]);
 
   } catch (e) {
     return Future.error('Failed to simulate generating conclusion: $e');
@@ -465,7 +474,7 @@ static Future<void> simulateA() async {
 
     await Future.delayed(Duration(seconds: 4));
 
-    showToast(message: 'Observation approved successfully', bgColor: Colors.green);
+    showToast(message: 'Observation approved successfully', bgColor: Colors.green[900]);
 
   } catch (e) {
     return Future.error('Failed to simulate generating conclusion: $e');
@@ -477,7 +486,7 @@ static Future<void> simulateD() async {
 
     await Future.delayed(Duration(seconds: 4));
 
-    showToast(message: 'Report downloaded successfully', bgColor: Colors.green);
+    showToast(message: 'Report downloaded successfully', bgColor: Colors.green[900]);
 
   } catch (e) {
     return Future.error('Failed to simulate generating conclusion: $e');
@@ -489,7 +498,7 @@ static Future<void> simulateR() async {
 
     await Future.delayed(Duration(seconds: 4));
 
-    showToast(message: 'Report generated successfully', bgColor: Colors.green);
+    showToast(message: 'Report generated successfully', bgColor: Colors.green[900]);
 
   } catch (e) {
     return Future.error('Failed to simulate generating conclusion: $e');

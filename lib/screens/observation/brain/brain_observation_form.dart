@@ -144,6 +144,21 @@ int calculateLines(String text) {
 
 }
 
+  void fillAddNewPatientErrorList() {
+  // Reinitialize errors
+  initErrors();
+
+  // Add errors to list
+  if (newPatientNameController.text.isEmpty) {
+    addError(error: 'Patient name is required');
+  }
+
+  if (birthYearController.text.isEmpty) {
+    addError(error: 'Birth year is required');
+  }
+
+  }
+
 
   void showSubmitBottomSheet(BuildContext context) {
 
@@ -368,9 +383,15 @@ CustomTextFormField(
 
           ElevatedButton(
   onPressed: (userState.isSavingNewPatient) ? () {} : () {
+    fillAddNewPatientErrorList();
+
+if (errors.isNotEmpty) {
+  showErrorBottomSheet(context, errors);
+} else {
                 StoreProvider.of<GlobalState>(context).dispatch(
                   SaveNewPatientAction(newPatientNameController.text, birthYearController.text),
                 );
+}
   },
   style: ElevatedButton.styleFrom(
     elevation: 5,
