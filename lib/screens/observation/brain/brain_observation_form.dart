@@ -4,6 +4,7 @@ import 'package:brainmri/screens/observation/brain/brain_observation_model.dart'
 import 'package:brainmri/screens/observation/components/custom_dropdown.dart';
 import 'package:brainmri/screens/observation/components/custom_text_field.dart';
 import 'package:brainmri/screens/observation/components/custom_textformfield.dart';
+import 'package:brainmri/screens/observation/components/primary_custom_button.dart';
 import 'package:brainmri/screens/observation/components/template.dart';
 import 'package:brainmri/screens/user/user_reducer.dart';
 import 'package:brainmri/store/app_logs.dart';
@@ -69,7 +70,17 @@ int calculateLines(String text) {
   // Reinitialize errors
   initErrors();
 
+  var state = StoreProvider.of<GlobalState>(context).state.appState.userState;
+
   // Add errors to list
+  if(state.selectedOType.isEmpty) {
+    addError(error: 'Selecting a scan type is required');
+  }
+
+  if(state.selectedPatient.isEmpty) {
+    addError(error: 'Selecting a patient is required');
+  }
+
   if (observation.scanningTechnique.isEmpty) {
     addError(error: 'Scanning technique is required');
   }
@@ -159,6 +170,129 @@ int calculateLines(String text) {
 
   }
 
+  void _regenerateConclusion() {
+    print('regenerate conclusion');
+
+        StoreProvider.of<GlobalState>(context).dispatch(
+      SimulateGenerateConclusionAction(),
+    );
+
+    //     // Below template, for testing purposes only
+//     // ------------ //
+    String observationString = """
+- Scanning Technique: T1 FSE-sagittal, T2 FLAIR, T2 FSE-axial, T2 FSE-coronal
+- Basal Ganglia:
+  - Location: Usually located
+  - Symmetry: Symmetrical
+  - Contour: Clear, even contours
+  - Dimensions: Not changed
+  - MR Signal: Not changed
+- Brain Grooves and Ventricles:
+  - Lateral Ventricles Width: Right: 7 mm, Left: 9 mm
+  - Third Ventricle Width: 4 mm
+  - Sylvian Aqueduct: Not changed
+  - Fourth Ventricle: Tent-shaped and not dilated
+- Brain Structures:
+  - Corpus Callosum: Normal shape and size
+  - Brain Stem: Without features
+  - Cerebellum: Normal shape
+  - Craniovertebral Junction: Unchanged
+  - Pituitary Gland: Normal shape, height 4 mm in sagittal projection
+- Optic Nerves and Orbital Structures:
+  - Orbital Cones Shape: Unchanged
+  - Eyeballs Shape and Size: Spherical and normal size
+  - Optic Nerves Diameter: Preserved
+  - Extraocular Muscles: Normal size, without pathological signals
+  - Retrobulbar Fatty Tissue: Without pathological signals
+- Paranasal Sinuses:
+  - Cysts Presence: Not mentioned
+  - Cysts Size: Not mentioned
+  - Sinuses Pneumatization: Usually pneumatized
+- Additional Observations: None mentioned
+""";
+// ------------ //
+    
+        // print('observationString: $observationString');
+
+    // StoreProvider.of<GlobalState>(context).dispatch(
+    //   GenerateConclusionAction(observationString),
+    // );
+  }
+
+  void _generateConclusion() {
+    print('generate conclusion');
+    
+//     // Below template, for testing purposes only
+//     // ------------ //
+    String observationString = """
+- Scanning Technique: T1 FSE-sagittal, T2 FLAIR, T2 FSE-axial, T2 FSE-coronal
+- Basal Ganglia:
+  - Location: Usually located
+  - Symmetry: Symmetrical
+  - Contour: Clear, even contours
+  - Dimensions: Not changed
+  - MR Signal: Not changed
+- Brain Grooves and Ventricles:
+  - Lateral Ventricles Width: Right: 7 mm, Left: 9 mm
+  - Third Ventricle Width: 4 mm
+  - Sylvian Aqueduct: Not changed
+  - Fourth Ventricle: Tent-shaped and not dilated
+- Brain Structures:
+  - Corpus Callosum: Normal shape and size
+  - Brain Stem: Without features
+  - Cerebellum: Normal shape
+  - Craniovertebral Junction: Unchanged
+  - Pituitary Gland: Normal shape, height 4 mm in sagittal projection
+- Optic Nerves and Orbital Structures:
+  - Orbital Cones Shape: Unchanged
+  - Eyeballs Shape and Size: Spherical and normal size
+  - Optic Nerves Diameter: Preserved
+  - Extraocular Muscles: Normal size, without pathological signals
+  - Retrobulbar Fatty Tissue: Without pathological signals
+- Paranasal Sinuses:
+  - Cysts Presence: Not mentioned
+  - Cysts Size: Not mentioned
+  - Sinuses Pneumatization: Usually pneumatized
+- Additional Observations: None mentioned
+""";
+// ------------ //
+
+
+// fillErrorList();
+
+if (!errors.isNotEmpty) {
+  showErrorBottomSheet(context, errors);
+} else {
+
+    StoreProvider.of<GlobalState>(context).dispatch(
+      SimulateGenerateConclusionAction(),
+    );
+
+
+//     print('observation: ${observation.toJson()}');
+
+//     String observationString = fillObservationTemplate(observation);
+
+        print('observationString: $observationString');
+
+    print('generating conclusion');
+
+    // StoreProvider.of<GlobalState>(context).dispatch(
+    //   SaveObservationAction(observationString),
+    // );
+
+    // delay 2 seconds to save observationString
+    // Future.delayed(const Duration(seconds: 2));
+    
+    // StoreProvider.of<GlobalState>(context).dispatch(
+    //   GenerateConclusionAction(observationString),
+    // );
+
+    showSubmitBottomSheet(context);
+
+}
+  }
+
 
   void showSubmitBottomSheet(BuildContext context) {
 
@@ -206,6 +340,7 @@ int calculateLines(String text) {
         ),
         child: IconButton(
           onPressed: () {
+            store.dispatch(ReinitializeFormAction());
             Navigator.of(context).pop();
           },
           icon: Icon(Icons.close, color: Colors.black, size: 18,),
@@ -260,41 +395,21 @@ CustomTextFormField(
 ),
   const SizedBox(height: 32.0),
 
-  SizedBox(
-                  width: double.infinity,
-                  child:
+userState.conclusion.isNotEmpty ?
+  PrimaryCustomButton(
+    label: 'Regenerate',
+    onPressed: (userState.isGeneratingConclusion) ? () {} : _regenerateConclusion,
+    loading: userState.isGeneratingConclusion,
+  ) : const SizedBox(height: 0.0),
+  
+  const SizedBox(height: 32.0),
 
-          ElevatedButton(
-  onPressed: (userState.isGeneratingConclusion || userState.isSavingObservation) ? () {} : _submitForm,
-  style: ElevatedButton.styleFrom(
-    elevation: 5,
-    surfaceTintColor: Colors.transparent,
-    backgroundColor: Colors.transparent,
-    foregroundColor: Colors.white, // Set the text color (applies to foreground)
-    textStyle: TextStyle(
-      fontSize: 18,
-      fontWeight: FontWeight.w700, 
-    ),
-    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 40), // Set the padding
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.all(Radius.circular(5)), // Set the border radius
-            side: BorderSide(
-        color: Colors.white,
-        width: 2,
-      ),
-    ),
+    PrimaryCustomButton(
+    label: 'Submit',
+    onPressed: (userState.isGeneratingConclusion || userState.isSavingObservation) ? () {} : _submitForm,
+    loading: userState.isSavingObservation,
   ),
-  child: 
-    userState.isSavingObservation ? 
-      CircularProgressIndicator(
-    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF232428)), // Change the progress color
-    backgroundColor: Color(0xFFC3C3C3), // Change the background color
-  ) :
-  Text(
-    'Submit'
-  ),
-),
-),
+
           ],
         ),
         ),
@@ -434,7 +549,6 @@ if (errors.isNotEmpty) {
 
   void _submitForm() {
 
-    // simulate submit form
 
     print('submitting form');
 
@@ -447,22 +561,13 @@ if (errors.isNotEmpty) {
 
     var state = StoreProvider.of<GlobalState>(context).state.appState.userState;
 
+    // simulate submit form
 
     StoreProvider.of<GlobalState>(context).dispatch(
       SimulateSavePatientObservationAction(),
     );
         }
-
-
-
-    // print(observation.toJson());
-
-
-    // if (!isSubmitFormValid(state.observationString, state.conclusion)) {
-    //   return;
-    // }
-
-    // final ObservationModel newOb = ObservationModel(
+    //     final ObservationModel newOb = ObservationModel(
     //   conclusion: ConclusionModel(
     //     text: state.conclusion,
     //     createdAt: DateTime.now(),
@@ -478,117 +583,10 @@ if (errors.isNotEmpty) {
     // StoreProvider.of<GlobalState>(context).dispatch(
     //   SavePatientObservationAction(state.selectedPatient['id']! , newOb),
     // );
+    //     }
 
     // Navigator.of(context).pop();
   }
-
-
-  //   bool isSubmitFormValid(String observationString, String conclusion) {
-  //   if (observationString.isEmpty) {
-  //     addError(error: 'Observation is required');
-  //     return false;
-  //   } else {
-  //     removeError(error: 'Observation is required');
-  //   }
-
-  //   if (conclusion.isEmpty) {
-  //     addError(error: 'Conclusion is required');
-  //     return false;
-  //   } else {
-  //     removeError(error: 'Conclusion is required');
-  //   }
-
-  //   return true;
-  // }
-
-
-  void _generateConclusion() {
-    print('generate conclusion');
-
-
-
-
-
-//     print('observation: ${observation.toJson()}');
-
-//     String observationString = fillObservationTemplate(observation);
-    
-//     // Below template, for testing purposes only
-//     // ------------ //
-// //     String observationString = """
-// // - Scanning Technique: T1 FSE-sagittal, T2 FLAIR, T2 FSE-axial, T2 FSE-coronal
-// // - Basal Ganglia:
-// //   - Location: Usually located
-// //   - Symmetry: Symmetrical
-// //   - Contour: Clear, even contours
-// //   - Dimensions: Not changed
-// //   - MR Signal: Not changed
-// // - Brain Grooves and Ventricles:
-// //   - Lateral Ventricles Width: Right: 7 mm, Left: 9 mm
-// //   - Third Ventricle Width: 4 mm
-// //   - Sylvian Aqueduct: Not changed
-// //   - Fourth Ventricle: Tent-shaped and not dilated
-// // - Brain Structures:
-// //   - Corpus Callosum: Normal shape and size
-// //   - Brain Stem: Without features
-// //   - Cerebellum: Normal shape
-// //   - Craniovertebral Junction: Unchanged
-// //   - Pituitary Gland: Normal shape, height 4 mm in sagittal projection
-// // - Optic Nerves and Orbital Structures:
-// //   - Orbital Cones Shape: Unchanged
-// //   - Eyeballs Shape and Size: Spherical and normal size
-// //   - Optic Nerves Diameter: Preserved
-// //   - Extraocular Muscles: Normal size, without pathological signals
-// //   - Retrobulbar Fatty Tissue: Without pathological signals
-// // - Paranasal Sinuses:
-// //   - Cysts Presence: Not mentioned
-// //   - Cysts Size: Not mentioned
-// //   - Sinuses Pneumatization: Usually pneumatized
-// // - Additional Observations: None mentioned
-// // """;
-// // ------------ //
-
-//     print('observationString: $observationString');
-
-//     print('saving observation');
-
-//     StoreProvider.of<GlobalState>(context).dispatch(
-//       SaveObservationAction(observationString),
-//     );
-
-//     print('generating conclusion');
-    
-//     StoreProvider.of<GlobalState>(context).dispatch(
-      // GenerateConclusionAction(observationString),
-//     );
-
-fillErrorList();
-
-if (errors.isNotEmpty) {
-  showErrorBottomSheet(context, errors);
-} else {
-
-    StoreProvider.of<GlobalState>(context).dispatch(
-      SimulateGenerateConclusionAction(),
-    );
-
-    showSubmitBottomSheet(context);
-
-}
-
-
-    // // delay to allow the conclusion to be generated
-    // Future.delayed(const Duration(seconds: 5), () {
-    // if (StoreProvider.of<GlobalState>(context).state.appState.userState.conclusion.isNotEmpty) {
-    // } else {
-    //   print('conclusion is empty');
-    // }
-    // });
-
-  
-  }
-
-  bool other = false;
 
       void reFetchData()  {
           print('refetching');
@@ -707,11 +705,19 @@ CustomTextFormField(
 ),
 const SizedBox(height: 14.0),
 CustomTextFormField(
-  labelText: 'Dimensions',
+  labelText: 'Contour',
   isInputEmpty: observation.basalGangliaContour.isEmpty,
   onChanged: (value) => setState(() => observation.basalGangliaContour = value),
   onClear: () => setState(() => observation.basalGangliaContour = ''),
   initialValue: observation.basalGangliaContour,
+),
+const SizedBox(height: 14.0),
+CustomTextFormField(
+  labelText: 'Dimensions',
+  isInputEmpty: observation.basalGangliaDimensions.isEmpty,
+  onChanged: (value) => setState(() => observation.basalGangliaDimensions = value),
+  onClear: () => setState(() => observation.basalGangliaDimensions = ''),
+  initialValue: observation.basalGangliaDimensions,
 ),
 const SizedBox(height: 14.0),
 CustomTextFormField(
@@ -989,7 +995,7 @@ CustomTextFormField(
     ),
   ),
   child: Text(
-    userState.conclusion.isEmpty ? 'Generate' : 'Regenerate'
+    'Generate'
   ),
 ),
 ),

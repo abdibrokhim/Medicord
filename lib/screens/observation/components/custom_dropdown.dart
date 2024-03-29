@@ -44,7 +44,10 @@ class _CustomDropdownWithSearchState extends State<CustomDropdownWithSearch> {
 
       void reFetchData()  {
           print('refetching');
+          if (widget.dState == 0) {
+
       store.dispatch(FetchAllPatientNamesAction());
+          }
 
   }
 
@@ -241,7 +244,12 @@ const SizedBox(height: 8),
                           'id': widget.items.firstWhere((element) => element['name'] == item)['id']!,
                           'name': item
                         };
-                        StoreProvider.of<GlobalState>(context).dispatch(SelectPatientAction(selected));
+                        if (widget.dState == 0) {
+                          StoreProvider.of<GlobalState>(context).dispatch(SelectPatientAction(selected));
+                        }
+                        if (widget.dState == 1) {
+                          StoreProvider.of<GlobalState>(context).dispatch(SelectObservationTypeAction(selected));
+                        }
                       });
                     },
                   );

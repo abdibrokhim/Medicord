@@ -91,10 +91,111 @@ class UserService {
         return [];
       }
     } catch (e) {
+      showToast(message: 'An error has occured', bgColor: getColor(AppColors.error));
+      AppLog.log().e('Error while fetching patients: $e');
       return Future.error('Error while fetching patients: $e');
     }
   }
 
+
+  static Future<PatientModel> fetchPatientAllObservations(String patientId) async {
+  try {
+    print('Fetching patient with ID: $patientId');
+
+    String? organizationId = await _getOrganizationId();
+    if (organizationId == null) {
+      return Future.error('No organization ID found');
+    }
+
+    DatabaseReference patientRef = _firebaseDatabase.ref().child('organizations').child(organizationId).child('patients').child(patientId);
+    DataSnapshot snapshot = (await patientRef.once()).snapshot;
+
+    if (snapshot.exists) {
+      print('snapshot.value: ${snapshot.value}');
+
+      Map<dynamic, dynamic> patientData = snapshot.value as Map<dynamic, dynamic>;
+      patientData['id'] = patientId;
+      print('patientData: $patientData');
+
+      if (patientData.containsKey('observations')) {
+        Map<dynamic, dynamic> observationsData = patientData['observations'] as Map<dynamic, dynamic>;
+        List<ObservationModel> observationsList = [];
+
+        observationsData.forEach((observationId, observationValue) {
+          Map<dynamic, dynamic> observationData = observationValue as Map<dynamic, dynamic>;
+          observationData['id'] = observationId;
+          print('observationId: $observationId');
+
+          if (observationData.containsKey('conclusion')) {
+            Map<dynamic, dynamic> conclusionData = observationData['conclusion'] as Map<dynamic, dynamic>;
+            observationData['conclusion'] = ConclusionModel.fromJson(conclusionData);
+          }
+
+          observationsList.add(ObservationModel.fromJson(observationData));
+        });
+
+        print('observationsList: $observationsList');
+
+        patientData['observations'] = observationsList;
+      }
+
+      print('patientData: $patientData');
+
+      return PatientModel.fromJson(patientData);
+    } else {
+      AppLog.log().e('No patient found with ID: $patientId');
+      return PatientModel();
+    }
+  } catch (e) {
+    showToast(message: 'An error has occurred', bgColor: getColor(AppColors.error));
+    AppLog.log().e('Error while fetching patient by ID: $e');
+    return Future.error('Error while fetching patient by ID: $e');
+  }
+}
+
+
+  static Future<Map<String, dynamic>> fetchPatientSingleObservation(String patientId, String observationId) async {
+  try {
+    print('Fetching observation with ID: $observationId for patient with ID: $patientId');
+
+    String? organizationId = await _getOrganizationId();
+    if (organizationId == null) {
+      return Future.error('No organization ID found');
+    }
+
+    DatabaseReference observationRef = _firebaseDatabase.ref().child('organizations').child(organizationId).child('patients').child(patientId).child('observations').child(observationId);
+    DataSnapshot snapshot = (await observationRef.once()).snapshot;
+
+    if (snapshot.exists) {
+      print('snapshot.value: ${snapshot.value}');
+
+      Map<dynamic, dynamic> observationData = snapshot.value as Map<dynamic, dynamic>;
+      observationData['id'] = observationId;
+      print('observationData: $observationData');
+
+      if (observationData.containsKey('conclusion')) {
+        Map<dynamic, dynamic> conclusionData = observationData['conclusion'] as Map<dynamic, dynamic>;
+        observationData['conclusion'] = ConclusionModel.fromJson(conclusionData);
+      }
+
+      Map<String, dynamic> result = {
+        'patientId': patientId,
+        'observation': observationData,
+      };
+
+      print('result: $result');
+      return result;
+
+    } else {
+      print('No observation found with ID: $observationId for patient with ID: $patientId');
+      return {};
+    }
+  } catch (e) {
+    showToast(message: 'An error has occurred', bgColor: getColor(AppColors.error));
+    AppLog.log().e('Error while fetching observation by ID: $e');
+    return Future.error('Error while fetching observation by ID: $e');
+  }
+}
 
 
 
@@ -111,8 +212,12 @@ class UserService {
         'text': conclusion,
         'updatedAt': DateTime.now().toIso8601String(),
       };
+      showToast(message: 'Observation updated successfully', bgColor: getColor(AppColors.success));
+
       await conclusionRef.update(jsonObject);
     } catch (e) {
+      showToast(message: 'An error has occured', bgColor: getColor(AppColors.error));
+      AppLog.log().e('Error while updating patient conclusion: $e');
       return Future.error('Error while updating patient conclusion: $e');
     }
   }
@@ -133,8 +238,12 @@ class UserService {
       };
       await conclusionRef.update(jsonObject);
 
+      showToast(message: 'Observation approved successfully', bgColor: getColor(AppColors.success));
+
       return true;
     } catch (e) {
+      showToast(message: 'An error has occured', bgColor: getColor(AppColors.error));
+      AppLog.log().e('Error while approving patient conclusion: $e');
       return Future.error('Error while approving patient conclusion: $e');
     }
   }
@@ -154,6 +263,8 @@ class UserService {
 
       return true;
     } catch (e) {
+      showToast(message: 'An error has occured', bgColor: getColor(AppColors.error));
+      AppLog.log().e('Error while validating patient conclusion: $e');
       return Future.error('Error while approving patient conclusion: $e');
     }
   }
@@ -177,15 +288,19 @@ class UserService {
       if (!snapshot.exists) {
         // If patient does not exist, return an error
         showToast(message: 'No patient found', bgColor: getColor(AppColors.error));
+
         return Future.error('Patient with ID $patientId does not exist');
       } else {
         print('snapshot.value: ${snapshot.value}');
         // If patient exists, add a new observation under the patient record with a unique ID
         DatabaseReference observationRef = patientRef.child('observations').push();  // Generate a unique ID for the new observation
+        
         showToast(message: 'Observation saved successfully', bgColor: getColor(AppColors.success));
         await observationRef.set(observationModel.toJson());
       }
     } catch (e) {
+      showToast(message: 'An error has occured', bgColor: getColor(AppColors.error));
+      AppLog.log().e('Error while saving patient observation: $e');
       return Future.error('Error while saving patient observation: $e');
     }
   }
@@ -198,7 +313,7 @@ class UserService {
       AppLog.log().i('Saving new patient: $fullName, $birthYear');
 
       if (organizationId == null) {
-        showToast(message: 'No organization ID found', bgColor: Colors.red[900]);
+        showToast(message: 'No organization ID found', bgColor: getColor(AppColors.error));
 
         return Future.error('No organization ID found');
       }
@@ -208,11 +323,12 @@ class UserService {
         'birthYear': birthYear,
       });
 
-      showToast(message: 'New patient saved', bgColor: Colors.green[900]);
+      showToast(message: 'New patient saved', bgColor: getColor(AppColors.success));
 
       AppLog.log().i('New patient saved');
     } catch (e) {
-      showToast(message: 'An error has occured', bgColor: Colors.red[900]);
+      showToast(message: 'An error has occured', bgColor: getColor(AppColors.error));
+      AppLog.log().e('Error while saving new patient: $e');
       return Future.error('Error while saving new patient: $e');
     }
   }
@@ -223,6 +339,7 @@ class UserService {
 
       String? organizationId = await _getOrganizationId();
       if (organizationId == null) {
+        showToast(message: 'No organization found', bgColor: getColor(AppColors.error));
         return Future.error('No organization ID found');
       }
       DatabaseReference patientsRef = _firebaseDatabase.ref().child('organizations').child(organizationId).child('patients');
@@ -250,6 +367,8 @@ class UserService {
         return [];
       }
     } catch (e) {
+      showToast(message: 'An error has occured', bgColor: getColor(AppColors.error));
+      AppLog.log().e('Error while fetching patient names: $e');
       return Future.error('Error while fetching patient names: $e');
     }
   }
@@ -273,8 +392,9 @@ class UserService {
         return Future.error('Failed to generate conclusion');
       }
     } catch (e) {
-      AppLog.log().e("Failed to generate conclusion: $e");
-      return Future.error('Failed to generate conclusion');
+      showToast(message: 'An error has occured', bgColor: getColor(AppColors.error));
+      AppLog.log().e('Failed to generate conclusion: $e');
+      return Future.error('Failed to generate conclusion: $e');
     }
   }
 
@@ -296,7 +416,8 @@ class UserService {
         return Future.error('Failed to generate conclusion');
       }
     } catch (e) {
-      AppLog.log().e("Failed to generate conclusion: $e");
+      showToast(message: 'An error has occured', bgColor: getColor(AppColors.error));
+      AppLog.log().e('Failed to generate conclusion: $e');
       return Future.error('Failed to generate conclusion');
     }
   }
@@ -358,15 +479,18 @@ static Future<String> generatePatientReport(PatientModel patientModel) async {
     final file = File(filePath);
     await file.writeAsBytes(await pdf.save());
 
-    print("File path: $filePath");
-    print("File name: ${file.path}");
+    print('File path: $filePath');
+    print('File name: ${file.path}');
 
     String fileUrl = await upload(filePath);
+
+    showToast(message: 'Report generated successfully', bgColor: getColor(AppColors.success));
 
     return fileUrl;
 
   } catch (e) {
-    print("Error while generating patient report: $e");
+    showToast(message: 'An error has occured', bgColor: getColor(AppColors.error));
+    print('Failed to generate patient report due to an exception: $e');
     return Future.error('Failed to generate patient report due to an exception: $e');
   }
 }
@@ -400,10 +524,11 @@ static Future<String> upload(String path) async {
     // Get the download URL of the uploaded file
     final fileUrl = await taskSnapshot.ref.getDownloadURL();
 
-    AppLog.log().i('File uploaded to firebase storage.');
+    AppLog.log().i('File uploaded to firebase storage: $fileUrl');
 
     return fileUrl;
   } catch (e) {
+    showToast(message: 'An error has occured', bgColor: getColor(AppColors.error));
     AppLog.log().e('Failed to upload file to firebase storage: $e');
     throw Exception('Failed to upload file to firebase storage: $e');
   }
@@ -425,13 +550,15 @@ static Future<void> downloadFile(String reportUrl) async {
     Dio dio = Dio();
     await dio.download(reportUrl, filePath);
 
-    print('File downloaded to: $filePath');
+    AppLog.log().e('File downloaded to: $filePath');
 
     // Open the file (optional)
     await OpenFile.open(filePath);
 
   } catch (e) {
-    print('Error while downloading file: $e');
+    showToast(message: 'An error has occured', bgColor: getColor(AppColors.error));
+    AppLog.log().e('Error while downloading file: $e');
+    throw Exception('Error while downloading file: $e');
   }
 }
 

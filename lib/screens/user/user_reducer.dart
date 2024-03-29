@@ -24,6 +24,7 @@ class UserState {
   final bool isFetchingPatientNames;
   final List<Map<String, String>> patientNames;
   final Map<String, String> selectedPatient;
+  final Map<String, String> selectedOType;
   final BrainObservationModel? brainObservation;
   final String conclusion;
   final bool isGeneratingConclusion;
@@ -31,6 +32,8 @@ class UserState {
   final bool isGeneratingReport;
   final bool isDownloadingReport;
   final String reportPath;
+  final List<ObservationModel> patientObservations;
+  final ObservationModel? patientSingleObservation;
 
   UserState({
     this.isLoading = false,
@@ -50,6 +53,7 @@ class UserState {
     this.isFetchingPatientNames = false,
     this.patientNames = const [],
     this.selectedPatient = const {},
+    this.selectedOType = const {},
     this.brainObservation,
     this.conclusion = '',
     this.isGeneratingConclusion = false,
@@ -57,6 +61,8 @@ class UserState {
     this.isGeneratingReport = false,
     this.isDownloadingReport = false,
     this.reportPath = '',
+    this.patientObservations = const [],
+    this.patientSingleObservation,
   });
 
   UserState copyWith({
@@ -77,6 +83,7 @@ class UserState {
     bool? isFetchingPatientNames,
     List<Map<String, String>>? patientNames,
     Map<String, String>? selectedPatient,
+    Map<String, String>? selectedOType,
     BrainObservationModel? brainObservation,
     String? conclusion,
     bool? isGeneratingConclusion,
@@ -84,6 +91,9 @@ class UserState {
     bool? isGeneratingReport,
     bool? isDownloadingReport,
     String? reportPath,
+    List<ObservationModel>? patientObservations,
+    ObservationModel? patientSingleObservation,
+
   }) {
     return UserState(
       isLoading: isLoading ?? this.isLoading,
@@ -103,6 +113,7 @@ class UserState {
       isFetchingPatientNames: isFetchingPatientNames ?? this.isFetchingPatientNames,
       patientNames: patientNames ?? this.patientNames,
       selectedPatient: selectedPatient ?? this.selectedPatient,
+      selectedOType: selectedOType ?? this.selectedOType,
       brainObservation: brainObservation ?? this.brainObservation,
       conclusion: conclusion ?? this.conclusion,
       isGeneratingConclusion: isGeneratingConclusion ?? this.isGeneratingConclusion,
@@ -110,12 +121,11 @@ class UserState {
       isGeneratingReport: isGeneratingReport ?? this.isGeneratingReport,
       isDownloadingReport: isDownloadingReport ?? this.isDownloadingReport,
       reportPath: reportPath ?? this.reportPath,
+      patientObservations: patientObservations ?? this.patientObservations,
+      patientSingleObservation: patientSingleObservation ?? this.patientSingleObservation,
     );
   }
 }
-
-
-
 
 
 // ========== SignInWithGoogle reducers ========== //
@@ -214,6 +224,86 @@ UserState loginSuccessReducer(UserState state, LoginSuccessAction action) {
     user: action.user,
   );
 }
+
+// ========== Fetch Specific Patient observations by patient id reducers ========== //
+class FetchPatientAllObservations {
+  final String patientId;
+
+  FetchPatientAllObservations(
+    this.patientId,
+  );
+}
+
+class FetchPatientAllObservationsResponse {
+  final PatientModel observations;
+
+  FetchPatientAllObservationsResponse(
+    this.observations,
+  );
+}
+
+UserState fetchPatientAllObservationsReducer(UserState state, FetchPatientAllObservations action) {
+  return state.copyWith(isLoading: true);
+}
+
+UserState fetchPatientAllObservationsResponseReducer(UserState state, FetchPatientAllObservationsResponse action) {
+  return state.copyWith(
+    isLoading: false,
+    patientsList: state.patientsList.map((patient) {
+      if (patient.id == action.observations.id) {
+        return action.observations;
+      }
+      return patient;
+    }).toList(),
+  );
+}
+
+// ========== Fetch Specific Patient observation by patient id and observation id reducers ========== //
+class FetchPatientSingleObservation {
+  final String patientId;
+  final String observationId;
+
+  FetchPatientSingleObservation(
+    this.patientId,
+    this.observationId,
+  );
+}
+
+class FetchPatientSingleObservationResponse {
+  final Map<String, dynamic> data;
+
+  FetchPatientSingleObservationResponse(
+    this.data,
+  );
+}
+
+UserState fetchPatientSingleObservationReducer(UserState state, FetchPatientSingleObservation action) {
+  return state.copyWith(isLoading: true);
+}
+
+UserState fetchPatientSingleObservationResponseReducer(UserState state, FetchPatientSingleObservationResponse action) {
+
+  String pId = action.data['patientId'];
+  ObservationModel o = ObservationModel.fromJson(action.data['observation']);
+  print('observation: $o');
+
+  return state.copyWith(
+    isLoading: false,
+    patientsList: state.patientsList.map((patient) {
+      if (patient.id == pId) {
+        List<ObservationModel> updatedObservations = patient.observations?.map((observation) {
+          if (observation.id == o.id) {
+            return o; // Use the updated observation object
+          }
+          return observation;
+        }).toList() ?? []; // Handle the case where patient.observations might be null
+        return patient.copyWith(observations: updatedObservations);
+      }
+      return patient;
+    }).toList(),
+  );
+}
+
 
 
 // ========== FetchAllPatients reducers ========== //
@@ -390,6 +480,19 @@ class SelectPatientAction {
 
 UserState selectPatientReducer(UserState state, SelectPatientAction action) {
   return state.copyWith(selectedPatient: action.patient);
+}
+
+
+// ========== selected Observation Type reducers ========== //
+
+class SelectObservationTypeAction {
+  final Map<String, String> type;
+
+  SelectObservationTypeAction(this.type);
+}
+
+UserState selectObservationTypeAction(UserState state, SelectObservationTypeAction action) {
+  return state.copyWith(selectedOType: action.type);
 }
 
 
@@ -629,6 +732,12 @@ Reducer<UserState> userReducer = combineReducers<UserState>([
   TypedReducer<UserState, GenerateReportResponse>(generateReportResponseReducer),
   TypedReducer<UserState, DownloadReportAction>(downloadReportReducer),
   TypedReducer<UserState, DownloadReportResponse>(downloadReportResponseReducer),
+  TypedReducer<UserState, SelectObservationTypeAction>(selectObservationTypeAction),
+  TypedReducer<UserState, FetchPatientAllObservations>(fetchPatientAllObservationsReducer),
+  TypedReducer<UserState, FetchPatientAllObservationsResponse>(fetchPatientAllObservationsResponseReducer),
+  TypedReducer<UserState, FetchPatientSingleObservation>(fetchPatientSingleObservationReducer),
+  TypedReducer<UserState, FetchPatientSingleObservationResponse>(fetchPatientSingleObservationResponseReducer),
+
   
   //==== simulations for testing purposes only ====//
   TypedReducer<UserState, SimulateGenerateConclusionAction>(simulateGenerateConclusionReducer),

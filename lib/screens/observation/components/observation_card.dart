@@ -1,5 +1,8 @@
+import 'package:brainmri/screens/user/user_reducer.dart';
+import 'package:brainmri/store/app_store.dart';
 import 'package:brainmri/utils/shared.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 
 
 class ObservationCard extends StatelessWidget {
@@ -21,7 +24,14 @@ class ObservationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return StoreConnector<GlobalState, UserState>(
+      onInit: (store) {
+        // store.dispatch(FetchAllPatientNamesAction());
+      },
+      converter: (appState) => appState.state.appState.userState,
+      builder: (context, userState) {
+        return
+    GestureDetector(
         onTap: onTap,
         child: 
     Column(
@@ -109,5 +119,7 @@ class ObservationCard extends StatelessWidget {
       ],
       ),
     );
+  }
+  );
   }
 }

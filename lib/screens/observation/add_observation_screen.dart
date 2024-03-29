@@ -52,7 +52,7 @@ class _AddObservationScreenState extends State<AddObservationScreen> {
             {'name': 'Brain', 'id': '1'},
           ],
           itemName: 'Select',
-          dState: 0
+          dState: 1
         ),
         ),
         ],

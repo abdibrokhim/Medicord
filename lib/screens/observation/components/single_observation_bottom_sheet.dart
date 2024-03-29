@@ -29,15 +29,51 @@ import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
     return tp.computeLineMetrics().length;
   }
 
-  void showObservationBottomSheet(BuildContext context, ObservationModel observation, String labelText, String pId) {
 
-  showModalBottomSheet(
-    isScrollControlled: true,
-    context: context,
-    builder: (BuildContext context) {
-      return StoreConnector<GlobalState, UserState>(
+class SingleObservationBottomSheet extends StatelessWidget {
+  final ObservationModel observation;
+  final String labelText;
+  final String pId;
+
+  SingleObservationBottomSheet({
+    required this.observation,
+    required this.labelText,
+    required this.pId,
+    Key? key
+    }) : super(key: key);
+
+
+  final RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
+
+  @override
+  Widget build(BuildContext context) {
+
+       void reFetchData()  {
+        print('Fetching single observation...');
+        
+      StoreProvider.of<GlobalState>(context).dispatch(FetchPatientSingleObservation(pId, observation.id!));
+  }
+
+
+  void _onRefresh() async{
+    // monitor network fetch
+    await Future.delayed(Duration(milliseconds: 1000));
+    // if failed,use refreshFailed()
+    reFetchData();
+    _refreshController.refreshCompleted();
+  }
+
+  void _onLoading() async{
+    // monitor network fetch
+    await Future.delayed(Duration(milliseconds: 1000));
+    // if failed,use loadFailed(),if no data return,use LoadNodata()
+    _refreshController.loadComplete();
+  }
+
+    return StoreConnector<GlobalState, UserState>(
       onInit: (store) {
-        store.dispatch(FetchAllPatientNamesAction());
+        // store.dispatch(FetchAllPatientNamesAction());
       },
       converter: (appState) => appState.state.appState.userState,
       builder: (context, userState) {
@@ -84,6 +120,11 @@ import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
 const SizedBox(height: 32.0),
 Expanded(
               child: 
+              Refreshable(
+            refreshController: _refreshController,
+            onRefresh: _onRefresh,
+            onLoading: _onLoading,
+            child: 
  ListView(
           children: [
 
@@ -116,7 +157,7 @@ CustomTextField(
   initialValue: observation.conclusion!.isApproved! ? 'Approved' : 'Pending',
   maxLines: 1,
   onTap: () {
-    showConfirmationBottomSheet(context, observation, pId);
+    showConfirmationBottomSheet(context, observation, pId, reFetchData);
   },
 ),
 
@@ -161,19 +202,34 @@ const SizedBox(height: 60.0),
           ],
 ),
  ),
+ ),
           ],
         ),
       );
     },
   );
+  }
 }
-  );
+
+  void showObservationBottomSheet(BuildContext context, ObservationModel observation, String labelText, String pId) {
+
+  showModalBottomSheet(
+    isScrollControlled: true,
+    context: context,
+    builder: (BuildContext context) {
+      return SingleObservationBottomSheet(
+        observation: observation,
+        labelText: labelText,
+        pId: pId,
+      );
+}
+      );
 }
 
 
-  void showConfirmationBottomSheet(BuildContext context, ObservationModel observation, String pId) {
+  void showConfirmationBottomSheet(BuildContext context, ObservationModel observation, String pId, void Function() reFetchData) {
 
-    final bool isApproved = !observation.conclusion!.isApproved!;
+    final bool isApproved = observation.conclusion!.isApproved!;
     final TextEditingController _dController = TextEditingController();
     
     _dController.text = isApproved ? observation.conclusion!.headDoctorName! : '';
@@ -265,13 +321,7 @@ isApproved ? const SizedBox() :
           ElevatedButton(
   onPressed: userState.isApprovingConclusion ? () {} : () async {
 print('Approving conclusion...');
-    //                                 if (!isApproved) {
-    //   StoreProvider.of<GlobalState>(context).dispatch(
-    //     ApprovePatientConclusionAction(pId, observation.id!, _dController.text),
-    //   );
-    // }
 
-        // simulate download
 
         if (_dController.text.isEmpty) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -280,9 +330,17 @@ print('Approving conclusion...');
           return;
         } else {
 
+        // simulate approval
+      // StoreProvider.of<GlobalState>(context).dispatch(
+      //     SimulateApprovePatientConclusionAction(),
+      //   );
+
       StoreProvider.of<GlobalState>(context).dispatch(
-          SimulateApprovePatientConclusionAction(),
-        );
+        ApprovePatientConclusionAction(pId, observation.id!, _dController.text),
+      );
+      
+      reFetchData();
+
         }
 
   },

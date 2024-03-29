@@ -2,6 +2,7 @@ import 'package:brainmri/models/observation_model.dart';
 import 'package:brainmri/models/patients_model.dart';
 import 'package:brainmri/screens/observation/components/observation_card.dart';
 import 'package:brainmri/screens/observation/components/single_observation_bottom_sheet.dart';
+import 'package:brainmri/screens/user/user_epics.dart';
 import 'package:brainmri/screens/user/user_reducer.dart';
 import 'package:brainmri/store/app_store.dart';
 import 'package:brainmri/utils/refreshable.dart';
@@ -30,6 +31,28 @@ class _ObservationsScreenState extends State<ObservationsScreen> {
   void initState() {
     super.initState();
     observations = widget.observations;
+  }
+
+  void reFetchData()  {
+      StoreProvider.of<GlobalState>(context).dispatch(FetchPatientAllObservations(widget.pId));
+  }
+
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
+
+  void _onRefresh() async{
+    // monitor network fetch
+    await Future.delayed(Duration(milliseconds: 1000));
+    // if failed,use refreshFailed()
+    reFetchData();
+    _refreshController.refreshCompleted();
+  }
+
+  void _onLoading() async{
+    // monitor network fetch
+    await Future.delayed(Duration(milliseconds: 1000));
+    // if failed,use loadFailed(),if no data return,use LoadNodata()
+    _refreshController.loadComplete();
   }
 
   void showObservation(o) {
@@ -62,7 +85,19 @@ class _ObservationsScreenState extends State<ObservationsScreen> {
           },
         ),
       ),
-      body: 
+      body: Refreshable(
+            refreshController: _refreshController,
+            onRefresh: _onRefresh,
+            onLoading: _onLoading,
+            child: 
+      StoreConnector<GlobalState, UserState>(
+      onInit: (store) {
+        store.dispatch(FetchPatientAllObservations(widget.pId));
+      },
+      converter: (appState) => appState.state.appState.userState,
+      builder: (context, userState) {
+        
+        return
       Padding(padding: 
       const EdgeInsets.all(20),
       child:
@@ -85,6 +120,9 @@ class _ObservationsScreenState extends State<ObservationsScreen> {
       );
     },
   ),
+      );
+  }
+    ),
       ),
     );
   }

@@ -128,6 +128,30 @@ Stream<dynamic> downloadReportEpic(Stream<dynamic> actions, EpicStore<GlobalStat
           ]));
 }
 
+Stream<dynamic> fetchPatientAllObservationsEpic(Stream<dynamic> actions, EpicStore<GlobalState> store) {
+  return actions
+      .where((action) => action is FetchPatientAllObservations)
+      .asyncMap((action) => UserService.fetchPatientAllObservations(action.patientId))
+      .flatMap<dynamic>((value) => Stream.fromIterable([
+            FetchPatientAllObservationsResponse(value),
+          ]))
+      .onErrorResume((error, stackTrace) => Stream.fromIterable([
+            HandleGenericErrorAction('Error while fetching patient names'),
+          ]));
+}
+
+Stream<dynamic> fetchPatientSingleObservationEpic(Stream<dynamic> actions, EpicStore<GlobalState> store) {
+  return actions
+      .where((action) => action is FetchPatientSingleObservation)
+      .asyncMap((action) => UserService.fetchPatientSingleObservation(action.patientId, action.observationId))
+      .flatMap<dynamic>((value) => Stream.fromIterable([
+            FetchPatientSingleObservationResponse(value),
+          ]))
+      .onErrorResume((error, stackTrace) => Stream.fromIterable([
+            HandleGenericErrorAction('Error while fetching patient names'),
+          ]));
+}
+
 
 
 
@@ -210,6 +234,10 @@ List<Stream<dynamic> Function(Stream<dynamic>, EpicStore<GlobalState>)> userEffe
   geminiEpic,
   generateReportEpic,
   downloadReportEpic,
+  fetchPatientAllObservationsEpic,
+  fetchPatientSingleObservationEpic,
+
+  //==== simulations for testing purposes only ====//
   simulateGenerateConclusionResponseActionEpic,
   simulateSavePatientObservationAction,
   simulateApprovePatientConclusionAction,
