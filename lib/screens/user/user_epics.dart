@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:brainmri/screens/user/user_reducer.dart';
 import 'package:brainmri/screens/user/user_service.dart';
 import 'package:brainmri/store/app_store.dart';
-import 'package:brainmri/utils/error_reducer.dart';
 import 'package:redux_epics/redux_epics.dart';
 import 'package:rxdart/rxdart.dart';
 

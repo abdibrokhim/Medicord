@@ -26,14 +26,14 @@ class Bridge extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isO = false;
 
-    _getOrganizationId().then((value) {
-      isO = value;
-    });
+    // _getOrganizationId().then((value) {
+    //   isO = value;
+    // });
 
-    return StoreConnector<GlobalState, UserState>(
-        converter: (store) => store.state.appState.userState,
-        builder: (context, userState) {
-          return (userState.isLoggedIn || isO) ? const MainLayout() : const SignInScreen();
+    return StoreConnector<GlobalState, bool>(
+        converter: (store) => store.state.appState.userState.isLoggedIn,
+        builder: (context, isLoggedIn) {
+          return (isLoggedIn || isO) ? const MainLayout() : const SignInScreen();
         }
     );
   }

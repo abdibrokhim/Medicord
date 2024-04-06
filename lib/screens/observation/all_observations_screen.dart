@@ -66,7 +66,7 @@ class _AllObservationsScreenState extends State<AllObservationsScreen> {
       builder: (context, userState) {
         
         return
-        userState.patientsList.isEmpty ? 
+        userState.isPatientsListLoading ? 
         const Column(
           mainAxisAlignment: MainAxisAlignment.center,
     crossAxisAlignment: CrossAxisAlignment.center,
@@ -87,6 +87,18 @@ class _AllObservationsScreenState extends State<AllObservationsScreen> {
           ),
     ],
   ) :
+  userState.patientsList.isEmpty ?
+  const Center(
+    child: Text(
+      'No patients found',
+      style: TextStyle(
+        color: Colors.white,
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+      ),
+    ),
+  )
+  :
 
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),

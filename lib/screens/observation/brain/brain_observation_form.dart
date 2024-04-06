@@ -258,7 +258,7 @@ int calculateLines(String text) {
 // ------------ //
 
 
-// fillErrorList();
+fillErrorList();
 
 if (!errors.isNotEmpty) {
   showErrorBottomSheet(context, errors);

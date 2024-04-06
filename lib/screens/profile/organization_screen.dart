@@ -1,3 +1,5 @@
+import 'package:brainmri/auth/signin/signin_screen.dart';
+import 'package:brainmri/screens/observation/components/primary_custom_button.dart';
 import 'package:brainmri/screens/user/user_reducer.dart';
 import 'package:brainmri/store/app_store.dart';
 import 'package:brainmri/utils/constants.dart';
@@ -25,6 +27,11 @@ class _OrganizationScreenState extends State<OrganizationScreen> {
     String email = user.email ?? 'No Email';
     return 
 StoreConnector<GlobalState, UserState>(
+  onDidChange: (prev, next) {
+    if (!next.isLoggedIn) {
+      Navigator.of(context).push(MaterialPageRoute(builder: (context) => const SignInScreen()));
+    }
+  },
         converter: (store) => store.state.appState.userState,
         builder: (context, userState) {
 
@@ -64,6 +71,15 @@ StoreConnector<GlobalState, UserState>(
           ],
         ),
         Expanded(child: SizedBox(),),
+        PrimaryCustomButton(
+          label: 'Sign Out',
+          onPressed: () {
+            store.dispatch(SignOutAction());
+          },
+          loading: userState.isLoading,
+          isDisabled: userState.isLoading,
+        ),
+        SizedBox(height: 40,),
           ]
         ),
         ),

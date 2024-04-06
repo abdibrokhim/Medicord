@@ -1,3 +1,4 @@
+import 'package:brainmri/auth/components/google_provider.dart';
 import 'package:brainmri/auth/signup/signup_screen.dart';
 import 'package:brainmri/screens/mainlayout/main_layout_screen.dart';
 import 'package:brainmri/screens/observation/components/custom_textformfield.dart';
@@ -156,14 +157,28 @@ class _SignInScreenState extends State<SignInScreen> {
       ),
     ),
   ),
-  child: Text(
+  child: userState.isLoading ? 
+      CircularProgressIndicator(
+    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF232428)), // Change the progress color
+    backgroundColor: Color(0xFFC3C3C3), // Change the background color
+  ) :
+  Text(
     'Sign In'
   ),
 ),
 ),
                 const SizedBox(height: 20,),
+                
+                Text("Or".toUpperCase(), style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                ),),
+                const SizedBox(height: 20,),
+SignInWithGoogleWidget(),
+                const SizedBox(height: 20,),
 
-                Text("Don't have an account?", style: TextStyle(
+                Text("Don't have an account?".toUpperCase(), style: TextStyle(
                   color: Colors.white,
                   fontSize: 22,
                   fontWeight: FontWeight.w700,
@@ -197,7 +212,12 @@ class _SignInScreenState extends State<SignInScreen> {
       ),
     ),
   ),
-  child: Text(
+  child: userState.isLoading ? 
+      CircularProgressIndicator(
+    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF232428)), // Change the progress color
+    backgroundColor: Color(0xFFC3C3C3), // Change the background color
+  ) :
+  Text(
     'Sign Up'
   ),
 ),

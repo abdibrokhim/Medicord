@@ -225,6 +225,28 @@ UserState loginSuccessReducer(UserState state, LoginSuccessAction action) {
   );
 }
 
+
+// ========== SignOut reducers ========== //
+
+class SignOutAction {
+  SignOutAction();
+}
+
+UserState signOutReducer(UserState state, SignOutAction action) {
+  return state.copyWith(isLoading: true);
+}
+
+class SignOutResponseAction {
+  SignOutResponseAction();
+}
+
+UserState signOutResponseReducer(UserState state, SignOutResponseAction action) {
+  return state.copyWith(
+    isLoading: false,
+    isLoggedIn: false,
+  );
+}
+
 // ========== Fetch Specific Patient observations by patient id reducers ========== //
 class FetchPatientAllObservations {
   final String patientId;
@@ -699,12 +721,44 @@ UserState simulateDownloadReportResponseReducer(UserState state, SimulateDownloa
 }
 
 
+// ========== Handle Generic Error ========== //
+
+class HandleGenericErrorAction {
+  final String errorMessage;
+  
+  HandleGenericErrorAction(this.errorMessage);
+}
+
+UserState handleGenericErrorReducer(
+    UserState state, HandleGenericErrorAction action) {
+  return state.copyWith(
+    isLoading: false,
+    errors: [...state.errors, action.errorMessage],
+  );
+}
+
+
+// ========== Clear Generic Error ========== //
+
+class ClearGenericErrorAction {
+  ClearGenericErrorAction();
+}
+
+UserState clearGenericErrorReducer(
+    UserState state, ClearGenericErrorAction action) {
+  return state.copyWith(
+    errors: [],
+  );
+}
+
 
 // ========== Combine all reducers ========== //
 
 Reducer<UserState> userReducer = combineReducers<UserState>([
   TypedReducer<UserState, SignInWithGoogle>(signInWithGoogleReducer),
   TypedReducer<UserState, SignInWithGoogleSuccessAction>(signInWithGoogleSuccessReducer),
+  TypedReducer<UserState, SignOutAction>(signOutReducer),
+  TypedReducer<UserState, SignOutResponseAction>(signOutResponseReducer),
   TypedReducer<UserState, FetchAllPatients>(fetchAllPatientsReducer),
   TypedReducer<UserState, FetchAllPatientsResponse>(fetchAllPatientsResponseReducer),
   TypedReducer<UserState, ApprovePatientConclusionAction>(approvePatientConclusionReducer),
@@ -737,6 +791,8 @@ Reducer<UserState> userReducer = combineReducers<UserState>([
   TypedReducer<UserState, FetchPatientAllObservationsResponse>(fetchPatientAllObservationsResponseReducer),
   TypedReducer<UserState, FetchPatientSingleObservation>(fetchPatientSingleObservationReducer),
   TypedReducer<UserState, FetchPatientSingleObservationResponse>(fetchPatientSingleObservationResponseReducer),
+  TypedReducer<UserState, HandleGenericErrorAction>(handleGenericErrorReducer),
+  TypedReducer<UserState, ClearGenericErrorAction>(clearGenericErrorReducer),
 
   
   //==== simulations for testing purposes only ====//
