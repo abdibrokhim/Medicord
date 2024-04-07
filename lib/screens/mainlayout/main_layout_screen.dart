@@ -149,7 +149,7 @@ DrawerHeader(
   child: 
       Text(
           textAlign: TextAlign.center,
-          'Version: 1.0.0', // Added app version
+          'version: 1.0.0', // Added app version
           style: TextStyle(
             color: Colors.white,
             fontSize: 14,

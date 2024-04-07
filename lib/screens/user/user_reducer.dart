@@ -1,3 +1,4 @@
+import 'package:brainmri/models/conclusion_model.dart';
 import 'package:brainmri/models/observation_model.dart';
 import 'package:brainmri/models/patients_model.dart';
 import 'package:brainmri/screens/observation/brain/brain_observation_model.dart';
@@ -369,8 +370,9 @@ class UpdatePatientConclusion {
 }
 
 class UpdatePatientConclusionResponse {
+  final Map<String, String> data;
 
-  UpdatePatientConclusionResponse();
+  UpdatePatientConclusionResponse(this.data);
 }
 
 UserState updatePatientConclusionReducer(UserState state, UpdatePatientConclusion action) {
@@ -378,7 +380,26 @@ UserState updatePatientConclusionReducer(UserState state, UpdatePatientConclusio
 }
 
 UserState updatePatientConclusionResponseReducer(UserState state, UpdatePatientConclusionResponse action) {
-  return state.copyWith(isSavingObservation: false);
+  String pId = action.data['patientId']!;
+  String oId = action.data['observationId']!;
+  String conclusion = action.data['conclusion']!;
+  print('Updating patient: $pId, observation: $oId, conclusion: $conclusion');
+
+  return state.copyWith(
+    isSavingObservation: false,
+    patientsList: state.patientsList.map((patient) {
+      if (patient.id == pId) {
+        List<ObservationModel> updatedObservations = patient.observations?.map((observation) {
+          if (observation.id == oId) {
+            return observation.copyWith(conclusion: ConclusionModel(text: conclusion));
+          }
+          return observation;
+        }).toList() ?? [];
+        return patient.copyWith(observations: updatedObservations);
+      }
+      return patient;
+    }).toList(),
+  );
 }
 
 
@@ -575,9 +596,11 @@ UserState saveObservationReducer(UserState state, SaveObservationAction action) 
 
 
 class GenerateReportAction {
-  final PatientModel patient;
+  final String patientName;
+  final String bYear;
+  final ObservationModel observation;
 
-  GenerateReportAction(this.patient);
+  GenerateReportAction(this.patientName, this.bYear, this.observation);
 }
 
 class GenerateReportResponse {
@@ -733,10 +756,18 @@ UserState handleGenericErrorReducer(
     UserState state, HandleGenericErrorAction action) {
   return state.copyWith(
     isLoading: false,
+    isPatientsListLoading: false,
+    isApprovingConclusion: false,
+    isValidatingConclusion: false,
+    isSavingObservation: false,
+    isSavingNewPatient: false,
+    isFetchingPatientNames: false,
+    isGeneratingConclusion: false,
+    isGeneratingReport: false,
+    isDownloadingReport: false,
     errors: [...state.errors, action.errorMessage],
   );
 }
-
 
 // ========== Clear Generic Error ========== //
 

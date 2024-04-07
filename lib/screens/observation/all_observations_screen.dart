@@ -1,5 +1,6 @@
 import 'package:brainmri/models/observation_model.dart';
 import 'package:brainmri/models/patients_model.dart';
+import 'package:brainmri/screens/observation/components/custom_search.dart';
 import 'package:brainmri/screens/observation/single_observation_screen.dart';
 import 'package:brainmri/screens/user/user_reducer.dart';
 import 'package:brainmri/store/app_store.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
 
@@ -20,14 +22,22 @@ class AllObservationsScreen extends StatefulWidget {
 }
 
 class _AllObservationsScreenState extends State<AllObservationsScreen> {
+  List<PatientModel> filteredPatients = [];
 
   @override
   void initState() {
     super.initState();
+    print('init state');
+
+    // Initialize filteredPatients in initState
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+      // StoreProvider.of<GlobalState>(context).dispatch(FetchAllPatients());
+    // });
   }
 
   void reFetchData()  {
       StoreProvider.of<GlobalState>(context).dispatch(FetchAllPatients());
+      filteredPatients = StoreProvider.of<GlobalState>(context).state.appState.userState.patientsList;
   }
 
   RefreshController _refreshController =
@@ -48,26 +58,41 @@ class _AllObservationsScreenState extends State<AllObservationsScreen> {
     _refreshController.loadComplete();
   }
 
+  void updateFilteredPatients(String filter) {
+    setState(() {
+      filteredPatients = StoreProvider.of<GlobalState>(context)
+          .state
+          .appState
+          .userState
+          .patientsList
+          .where((patient) {
+        final nameLower = patient.fullName!.toLowerCase();
+        final birthYearStr = patient.birthYear!.toString();
+        final filterLower = filter.toLowerCase();
+        return nameLower.contains(filterLower) ||
+            birthYearStr.contains(filterLower);
+      }).toList();
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 31, 33, 38),
-      body: Refreshable(
-            refreshController: _refreshController,
-            onRefresh: _onRefresh,
-            onLoading: _onLoading,
-            child: 
+      body: 
       StoreConnector<GlobalState, UserState>(
       onInit: (store) {
         store.dispatch(FetchAllPatients());
+        filteredPatients = store.state.appState.userState.patientsList;
       },
       converter: (appState) => appState.state.appState.userState,
       builder: (context, userState) {
-        
         return
         userState.isPatientsListLoading ? 
-        const Column(
+        const Center(
+          child:
+        Column(
           mainAxisAlignment: MainAxisAlignment.center,
     crossAxisAlignment: CrossAxisAlignment.center,
     children: [
@@ -79,6 +104,7 @@ class _AllObservationsScreenState extends State<AllObservationsScreen> {
       const SizedBox(height: 16.0),
           Text(
             'Fetching data...',
+            textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.white,
               fontSize: 16,
@@ -86,6 +112,7 @@ class _AllObservationsScreenState extends State<AllObservationsScreen> {
             ),
           ),
     ],
+  )
   ) :
   userState.patientsList.isEmpty ?
   const Center(
@@ -101,12 +128,26 @@ class _AllObservationsScreenState extends State<AllObservationsScreen> {
   :
 
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+          padding: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 24),
         child:
-      SingleChildScrollView(
+  Column(
+  children: [
+    // Search input
+              CustomSearchInput(
+                    onSearchChanged: updateFilteredPatients,
+                  ),
+    const SizedBox(height: 16),
+
+Expanded(child: 
+    Refreshable(
+            refreshController: _refreshController,
+            onRefresh: _onRefresh,
+            onLoading: _onLoading,
+            child: 
+
+    SingleChildScrollView(
   scrollDirection: Axis.vertical,
   child: 
-  
   Column(
   children: [
     // Header row
@@ -147,19 +188,46 @@ class _AllObservationsScreenState extends State<AllObservationsScreen> {
     const SizedBox(height: 4),
     const Divider(color: Colors.white),
     const SizedBox(height: 8),
-    // Data rows
-    ...userState.patientsList.asMap().entries.map((entry) {
-  int index = entry.key;
+                  ...filteredPatients.asMap().entries.map((entry) {
+                      int index = entry.key;
   PatientModel patient = entry.value;
+                    return PatientRow(patient: patient, index: index);
+                  }).toList(),
+    ],
+  ),
+        ),
+      ),
+      ),
+    ],
+      ),
+        );
+      }
+      ),
+    );
+  }
+}
 
-  return Column(
-    children: [
-      Row(
+
+class PatientRow extends StatelessWidget {
+  final PatientModel patient;
+  final int index;
+
+  const PatientRow({required this.patient, required this.index});
+
+
+  @override
+  Widget build(BuildContext context) {
+    var userState = StoreProvider.of<GlobalState>(context).state.appState.userState;
+
+    return Column(children: [
+    Padding(
+      padding: const EdgeInsets.symmetric(vertical: 0),
+      child: Row(
         children: [
           Expanded(
             child: Text(
               patient.fullName!,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
@@ -169,7 +237,7 @@ class _AllObservationsScreenState extends State<AllObservationsScreen> {
           Expanded(
             child: Text(
               patient.birthYear!.toString(),
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
@@ -181,7 +249,7 @@ class _AllObservationsScreenState extends State<AllObservationsScreen> {
               splashColor: Colors.transparent, // Removes the splash color
               child: Row(
                 children: [
-                  Text(
+                  const Text(
                     'expand',
                     style: TextStyle(
                       color: Colors.white,
@@ -194,6 +262,12 @@ class _AllObservationsScreenState extends State<AllObservationsScreen> {
                 ],
               ),
               onTap: () {
+                                        Map<String,String> selected = {
+                          'name': patient.fullName!,
+                          'birthYear': patient.birthYear!.toString(),
+                        };
+                        print('selected patient obs: $selected');
+                StoreProvider.of<GlobalState>(context).dispatch(SelectPatientAction(selected));
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -208,25 +282,14 @@ class _AllObservationsScreenState extends State<AllObservationsScreen> {
           ),
         ],
       ),
-      // Add a divider except for the last item
-      if (index != userState.patientsList.length - 1) 
-        Column(children: [
+    ),
+            if (index != userState.patientsList.length - 1) 
+        Column(
+          children: [
           const SizedBox(height: 8),
           const Divider(color: Color(0xFFAAAAAA)),
           const SizedBox(height: 8),
         ],),
-    ],
-  );
-}).toList(),
-
-  ],
-),
-
-        ),
-      );
-      }
-      ),
-      ),
-    );
+    ],);
   }
 }

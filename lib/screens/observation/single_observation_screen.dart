@@ -1,11 +1,13 @@
 import 'package:brainmri/models/observation_model.dart';
 import 'package:brainmri/models/patients_model.dart';
+import 'package:brainmri/screens/observation/components/custom_search.dart';
 import 'package:brainmri/screens/observation/components/observation_card.dart';
 import 'package:brainmri/screens/observation/components/single_observation_bottom_sheet.dart';
 import 'package:brainmri/screens/user/user_epics.dart';
 import 'package:brainmri/screens/user/user_reducer.dart';
 import 'package:brainmri/store/app_store.dart';
 import 'package:brainmri/utils/refreshable.dart';
+import 'package:brainmri/utils/shared.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter/material.dart';
@@ -26,11 +28,14 @@ class ObservationsScreen extends StatefulWidget {
 
 class _ObservationsScreenState extends State<ObservationsScreen> {
   late List<ObservationModel> observations;
+  List<ObservationModel> filteredObservations = [];
+  String labelText = "Brain MRI";
 
   @override
   void initState() {
     super.initState();
     observations = widget.observations;
+    filteredObservations = widget.observations;
   }
 
   void reFetchData()  {
@@ -56,7 +61,24 @@ class _ObservationsScreenState extends State<ObservationsScreen> {
   }
 
   void showObservation(o) {
-    showObservationBottomSheet(context, o, "Brain MRI", widget.pId);
+    showObservationBottomSheet(context, o, labelText, widget.pId);
+  }
+
+  void updateFilteredObservations(String filter) {
+    setState(() {
+      filteredObservations = observations.where((observation) {
+        final observationDateStr = formatDate(DateTime.parse(observation.observedAt!.toString())).toLowerCase();
+        final radiologistNameLower = observation.radiologistName!.toLowerCase();
+        final labelTextLower = labelText.toLowerCase();
+        final isApprovedStr = observation.conclusion!.isApproved! ? 'approved' : 'pending';
+        final filterLower = filter.toLowerCase();
+
+        return observationDateStr.contains(filterLower) ||
+            radiologistNameLower.contains(filterLower) ||
+            labelTextLower.contains(filterLower) ||
+            isApprovedStr.contains(filterLower);
+      }).toList();
+    });
   }
 
     TextEditingController conclusionController = TextEditingController();
@@ -85,11 +107,8 @@ class _ObservationsScreenState extends State<ObservationsScreen> {
           },
         ),
       ),
-      body: Refreshable(
-            refreshController: _refreshController,
-            onRefresh: _onRefresh,
-            onLoading: _onLoading,
-            child: 
+      body: 
+
       StoreConnector<GlobalState, UserState>(
       onInit: (store) {
         store.dispatch(FetchPatientAllObservations(widget.pId));
@@ -98,32 +117,50 @@ class _ObservationsScreenState extends State<ObservationsScreen> {
       builder: (context, userState) {
         
         return
-      Padding(padding: 
-      const EdgeInsets.all(20),
+              Padding(padding: 
+      const EdgeInsets.all(16),
       child:
+        Column(children: [
+          // Search input
+              CustomSearchInput(
+                    onSearchChanged: updateFilteredObservations,
+                  ),
+    const SizedBox(height: 16),
+
+    Expanded(child: 
+    Refreshable(
+            refreshController: _refreshController,
+            onRefresh: _onRefresh,
+            onLoading: _onLoading,
+            child: 
+
+
   GridView.builder(
     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
       crossAxisCount: 2,
       crossAxisSpacing: 20,
       mainAxisSpacing: 20,
     ),
-    itemCount: observations.length,
+    itemCount: filteredObservations.length,
     itemBuilder: (context, index) {
       return ObservationCard(
-        observationDate: observations[index].observedAt!.toString(),
-        radiologistName: observations[index].radiologistName!,
-        labelText: "Brain MRI",
-        isApproved: observations[index].conclusion!.isApproved!,
-        onTap: () {
-          showObservation(observations[index]);
-        },
-      );
+                        observationDate: filteredObservations[index].observedAt!.toString(),
+                        radiologistName: filteredObservations[index].radiologistName!,
+                        labelText: labelText,
+                        isApproved: filteredObservations[index].conclusion!.isApproved!,
+                        onTap: () {
+                          showObservation(filteredObservations[index]); // Use filteredObservations
+                        },
+                      );
     },
   ),
+  ),
+  ),
+        ],)
       );
   }
     ),
-      ),
+      // ),
     );
   }
 }

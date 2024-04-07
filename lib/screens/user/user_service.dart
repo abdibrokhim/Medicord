@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:brainmri/auth/components/secure_storage.dart';
 import 'package:brainmri/utils/constants.dart';
+import 'package:brainmri/utils/shared.dart';
 import 'package:brainmri/utils/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -199,7 +200,7 @@ class UserService {
 
 
 
-  static Future<void> updatePatientConclusion(String patientId, String observationId, String conclusion) async {
+  static Future<Map<String, String>> updatePatientConclusion(String patientId, String observationId, String conclusion) async {
     try {
       print('Updating patient conclusion: $patientId, $observationId, $conclusion');
       
@@ -214,7 +215,16 @@ class UserService {
       };
       showToast(message: 'Observation updated successfully', bgColor: getColor(AppColors.success));
 
+      try {
+
       await conclusionRef.update(jsonObject);
+        return {'patientId': patientId, 'observationId': observationId, 'conclusion': conclusion};
+
+      } catch (e) {
+        AppLog.log().e('An error has occured: $e');
+        return Future.error('An error has occured');
+      }
+
     } catch (e) {
       showToast(message: 'An error has occured', bgColor: getColor(AppColors.error));
       AppLog.log().e('Error while updating patient conclusion: $e');
@@ -428,37 +438,82 @@ class UserService {
   }
 
 
-static Future<String> generatePatientReport(PatientModel patientModel) async {
+static Future<String> generatePatientReport(String pName, String bYear, ObservationModel observation) async {
   try {
-    print('Generating patient report: ${patientModel.fullName}');
+    print('Generating patient report: ${pName}');
+
+    
+    String hospitalName = 'SI "REPUBLICAN SPECIALIZED CENTER FOR SURGERY NAMED AFTER ACADEMICIAN V. VAKHIDOV"';
+    String mriDepartment = 'DEPARTMENT OF MAGNETIC RESONANCE AND COMPUTED TOMOGRAPHY';
+    String phoneNumber = '+1234567890';
+    String disclaimerA = 'This conclusion is not a final diagnosis and requires comparison with clinical and laboratory data.';
+    String disclaimerB = 'In case of typos, contact phone: ${phoneNumber}';
+    String address = 'Uzbekistan, Tashkent, ul. Farkhadskaya 10. Phone: ${phoneNumber}';
+
 
     final pdf = pw.Document();
 
     pdf.addPage(
       pw.MultiPage(
-        build: (context) => [
-          pw.Header(
-            level: 0,
-            child: pw.Text('Patient Report: ${patientModel.fullName!}', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+        header: (context) => pw.Header(
+          level: 0,
+          child: pw.Column(
+            mainAxisAlignment: pw.MainAxisAlignment.center,
+            children: [
+              pw.SizedBox(height: 16),
+              pw.Header(
+                level: 1,
+                child: pw.Center(child: 
+                  pw.Text(hospitalName, style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+                ),
+              ),
+              pw.SizedBox(height: 8),
+              pw.Header(
+                level: 1,
+                child: pw.Center(child: 
+                  pw.Text(mriDepartment, style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+                ),
+              ),
+              pw.SizedBox(height: 24),
+              pw.Center(child: 
+                pw.Text(address, style: const pw.TextStyle(fontSize: 12)),
+              ),
+            ],
           ),
-          pw.Text('Full Name: ${patientModel.fullName!}', style: const pw.TextStyle(fontSize: 14)),
-          pw.Text('Birth Year: ${patientModel.birthYear!}', style: const pw.TextStyle(fontSize: 14)),
+        ),
+        build: (context) => [
+          pw.SizedBox(height: 24),
+          pw.Text('Full Name: ${pName}', style: const pw.TextStyle(fontSize: 16)),
+          pw.Text('Birth Year: ${bYear}', style: const pw.TextStyle(fontSize: 16)),
+          pw.Text('Observed At: ${observation.observedAt != null ? '${_formatDate(observation.observedAt!)} OR ${formatDate(observation.observedAt!)}' : ''}', style: const pw.TextStyle(fontSize: 16)),
+          pw.Text('Radiologist Name: ${observation.radiologistName!}', style: const pw.TextStyle(fontSize: 16)),
+          pw.Text('Signed By (Head Doctor Name): ${observation.conclusion!.headDoctorName!}', style: const pw.TextStyle(fontSize: 16)),
+          pw.SizedBox(height: 16),
           pw.Header(
             level: 1,
-            child: pw.Text('Observations', style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
+            child: pw.Center(child: 
+              pw.Text('PROTOCOL OF MRI STUDY OF THE BRAIN', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+            ),
           ),
-          ...patientModel.observations!.map((observation) => pw.Column(
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                children: [
-                  pw.Text('Observation: \n${observation.text!}', style: const pw.TextStyle(fontSize: 14)),
-                  pw.Text('Observed At: ${observation.observedAt != null ? _formatDate(observation.observedAt!) : ''}', style: const pw.TextStyle(fontSize: 14)),
-                  pw.Text('Radiologist Name: ${observation.radiologistName!}', style: const pw.TextStyle(fontSize: 14)),
-                  pw.Text('Conclusion: \n${observation.conclusion!.text!}', style: const pw.TextStyle(fontSize: 14)),
-                  pw.SizedBox(height: 10),
-                  pw.Text('Signed By: ${observation.conclusion!.headDoctorName!}', style: const pw.TextStyle(fontSize: 14)),
-                  pw.SizedBox(height: 10),
-                ],
-              )).toList(),
+          pw.SizedBox(height: 16),
+          pw.Text('${observation.text!}', style: const pw.TextStyle(fontSize: 14)),
+          pw.SizedBox(height: 16),
+          pw.Header(
+            level: 1,
+            child: pw.Center(child: 
+              pw.Text('Conclusion'.toUpperCase(), style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+            ),
+          ),
+          pw.SizedBox(height: 16),
+          pw.Text(observation.conclusion!.text!, style: const pw.TextStyle(fontSize: 14)),
+          pw.SizedBox(height: 48),
+          pw.Center(child: 
+            pw.Text(disclaimerA, style: const pw.TextStyle(fontSize: 12)),
+          ),
+          pw.SizedBox(height: 8),
+          pw.Center(child: 
+            pw.Text(disclaimerB, style: const pw.TextStyle(fontSize: 12)),
+          ),
         ],
       ),
     );
@@ -473,7 +528,7 @@ static Future<String> generatePatientReport(PatientModel patientModel) async {
     final directory = await getTemporaryDirectory();
     
     // Create the file path with the date and time appended
-    final filePath = '${directory.path}/PatientReport_${patientModel.fullName}_$formattedDateTime.pdf';
+    final filePath = '${directory.path}/PatientReport_${pName}_$formattedDateTime.pdf';
 
     // Save the PDF file
     final file = File(filePath);

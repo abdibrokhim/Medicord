@@ -163,34 +163,35 @@ class _CustomDropdownWithSearchState extends State<CustomDropdownWithSearch> {
       ),
     ],
 ),
-const SizedBox(height: 8),
-            TextField(
-              cursorColor: Colors.white,
-              controller: searchController,
-              style: TextStyle(
-                color: Colors.white,
+const SizedBox(height: 24),
+TextFormField(
+          cursorColor: Colors.black,
+          controller: searchController,
+          style: const TextStyle(
+            color: Colors.black,
+          ),
+          decoration: InputDecoration(
+            floatingLabelBehavior: FloatingLabelBehavior.never,
+            filled: true,
+            fillColor: const Color(0xFFC3C3C3),
+            labelStyle: const TextStyle(
+              color: Colors.transparent,
+            ),
+            prefixIcon: const Icon(
+              Icons.search,
+              color: Colors.black,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide.none,
+              borderRadius: BorderRadius.circular(5.0),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: const BorderSide(
+                color: Colors.black,
               ),
-              decoration: InputDecoration(
-                floatingLabelBehavior: FloatingLabelBehavior.never,
-                floatingLabelStyle: TextStyle(
-                  color: Colors.transparent,
-                ),
-                labelText: 'Search',
-                labelStyle: TextStyle(
-                  color: Colors.white,
-                ),
-                prefixIcon: const Icon(
-                  Icons.search,
-                  color: Colors.white,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide.none,
-                ),
-                border: InputBorder.none,
-                suffixIcon: searchController.text.isNotEmpty
+              borderRadius: BorderRadius.circular(5.0),
+            ),
+suffixIcon: searchController.text.isNotEmpty
                     ? IconButton(
                         onPressed: () {
                           searchController.clear();
@@ -202,12 +203,12 @@ const SizedBox(height: 8),
                         },
                         icon: Icon(
                           Icons.clear,
-                          color: Colors.white,
+                          color: Colors.black,
                         ),
                       )
                     : null,
               ),
-              onChanged: (String value) {
+                        onChanged: (String value) {
                 filteredItems = (widget.items.map((e) => e['name']!).toList() ?? []).where((item) {
                   final itemLower = item.toLowerCase();
                   final searchLower = value.toLowerCase();
@@ -215,8 +216,63 @@ const SizedBox(height: 8),
                 }).toList();
                 (context as Element).markNeedsBuild();
               },
-            ),
-            Divider(color: Colors.white),
+        ),
+          
+            // TextField(
+            //   cursorColor: Colors.white,
+            //   controller: searchController,
+            //   style: TextStyle(
+            //     color: Colors.white,
+            //   ),
+            //   decoration: InputDecoration(
+            //     floatingLabelBehavior: FloatingLabelBehavior.never,
+            //     floatingLabelStyle: TextStyle(
+            //       color: Colors.transparent,
+            //     ),
+            //     labelText: 'Search',
+            //     labelStyle: TextStyle(
+            //       color: Colors.white,
+            //     ),
+            //     prefixIcon: const Icon(
+            //       Icons.search,
+            //       color: Colors.white,
+            //     ),
+            //     enabledBorder: OutlineInputBorder(
+            //       borderSide: BorderSide.none,
+            //     ),
+            //     focusedBorder: OutlineInputBorder(
+            //       borderSide: BorderSide.none,
+            //     ),
+            //     border: InputBorder.none,
+            //     suffixIcon: searchController.text.isNotEmpty
+            //         ? IconButton(
+            //             onPressed: () {
+            //               searchController.clear();
+            //               filteredItems = widget.items.map((e) => e['name']!).toList();
+            //               (context as Element).markNeedsBuild();
+            //               setState(() {
+            //                 selected = {};
+            //               });
+            //             },
+            //             icon: Icon(
+            //               Icons.clear,
+            //               color: Colors.white,
+            //             ),
+            //           )
+            //         : null,
+            //   ),
+            //   onChanged: (String value) {
+            //     filteredItems = (widget.items.map((e) => e['name']!).toList() ?? []).where((item) {
+            //       final itemLower = item.toLowerCase();
+            //       final searchLower = value.toLowerCase();
+            //       return itemLower.contains(searchLower);
+            //     }).toList();
+            //     (context as Element).markNeedsBuild();
+            //   },
+            // ),
+
+            // Divider(color: Colors.white),
+            const SizedBox(height: 8),
             Expanded(
               child:     
               Refreshable(
@@ -228,7 +284,8 @@ const SizedBox(height: 8),
                 itemCount: filteredItems.length,
                 itemBuilder: (context, index) {
                   final item = filteredItems[index];
-                  return ListTile(
+                  return 
+                  ListTile(
                     title: Text(
                       item,
                       style: TextStyle(

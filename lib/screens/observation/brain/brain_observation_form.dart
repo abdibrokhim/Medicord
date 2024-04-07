@@ -303,7 +303,6 @@ if (!errors.isNotEmpty) {
       return 
       StoreConnector<GlobalState, UserState>(
       onInit: (store) {
-        // store.dispatch(FetchAllPatientNamesAction());
       },
       converter: (appState) => appState.state.appState.userState,
       builder: (context, userState) {

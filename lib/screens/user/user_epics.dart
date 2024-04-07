@@ -23,7 +23,7 @@ Stream<dynamic> updatePatientConclusionEpic(Stream<dynamic> actions, EpicStore<G
       .where((action) => action is UpdatePatientConclusion)
       .asyncMap((action) => UserService.updatePatientConclusion(action.patientId, action.observationId, action.conclusion))
       .flatMap<dynamic>((value) => Stream.fromIterable([
-            UpdatePatientConclusionResponse(),
+            UpdatePatientConclusionResponse(value),
           ]))
       .onErrorResume((error, stackTrace) => Stream.fromIterable([
             HandleGenericErrorAction('Error while updating patient conclusion'),
@@ -105,7 +105,7 @@ Stream<dynamic> geminiEpic(Stream<dynamic> actions, EpicStore<GlobalState> store
 Stream<dynamic> generateReportEpic(Stream<dynamic> actions, EpicStore<GlobalState> store) {
   return actions
       .where((action) => action is GenerateReportAction)
-      .asyncMap((action) => UserService.generatePatientReport(action.patient))
+      .asyncMap((action) => UserService.generatePatientReport(action.patientName, action.bYear, action.observation))
       .flatMap<dynamic>((value) => Stream.fromIterable([
             GenerateReportResponse(value),
           ]))

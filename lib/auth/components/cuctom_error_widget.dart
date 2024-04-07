@@ -24,7 +24,7 @@ class CustomErrorWidget extends StatelessWidget {
         for (var error in errors)
           Row(
             children: [
-               Icon(
+              Icon(
                 Icons.error_outline,
                 color: Colors.red[900],
               ),
