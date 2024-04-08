@@ -17,10 +17,12 @@ import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
 
 
 class ObservationsScreen extends StatefulWidget {
-  final String pId;
-  final List<ObservationModel> observations;
+  // final String pId;
+  // final List<ObservationModel> observations;
 
-  const ObservationsScreen({Key? key, required this.pId, required this.observations}) : super(key: key);
+  // required this.pId, required this.observations
+  const ObservationsScreen({Key? key, 
+  }) : super(key: key);
 
   @override
   State<ObservationsScreen> createState() => _ObservationsScreenState();
@@ -31,15 +33,26 @@ class _ObservationsScreenState extends State<ObservationsScreen> {
   List<ObservationModel> filteredObservations = [];
   String labelText = "Brain MRI";
 
+  var state = store.state.appState.userState;
+
   @override
   void initState() {
     super.initState();
-    observations = widget.observations;
-    filteredObservations = widget.observations;
+    // observations = widget.observations;
+    // filteredObservations = widget.observations;
+    observations = store.state.appState.userState.patientsAllObservations!.observations!;
+    filteredObservations = store.state.appState.userState.patientsAllObservations!.observations!;
+  }
+
+  void update() {
+    observations = store.state.appState.userState.patientsAllObservations!.observations!;
+    filteredObservations = store.state.appState.userState.patientsAllObservations!.observations!;
   }
 
   void reFetchData()  {
-      StoreProvider.of<GlobalState>(context).dispatch(FetchPatientAllObservations(widget.pId));
+      StoreProvider.of<GlobalState>(context).dispatch(FetchPatientAllObservations(store.state.appState.userState.patientsAllObservations!.id!));
+      print('ObservationsScreen store.state.appState.userState.patientsAllObservations!.id!, ${store.state.appState.userState.patientsAllObservations!.id!}');
+      update();
   }
 
   RefreshController _refreshController =
@@ -61,7 +74,7 @@ class _ObservationsScreenState extends State<ObservationsScreen> {
   }
 
   void showObservation(o) {
-    showObservationBottomSheet(context, o, labelText, widget.pId);
+    showObservationBottomSheet(context, o, labelText, state.patientsAllObservations!.id!);
   }
 
   void updateFilteredObservations(String filter) {
@@ -111,7 +124,8 @@ class _ObservationsScreenState extends State<ObservationsScreen> {
 
       StoreConnector<GlobalState, UserState>(
       onInit: (store) {
-        store.dispatch(FetchPatientAllObservations(widget.pId));
+        store.dispatch(FetchPatientAllObservations(store.state.appState.userState.patientsAllObservations!.id!));
+        print('ObservationsScreen onInit store.state.appState.userState.patientsAllObservations!.id!, ${store.state.appState.userState.patientsAllObservations!.id!}');
       },
       converter: (appState) => appState.state.appState.userState,
       builder: (context, userState) {
@@ -133,16 +147,27 @@ class _ObservationsScreenState extends State<ObservationsScreen> {
             onRefresh: _onRefresh,
             onLoading: _onLoading,
             child: 
+            
+            userState.isObservationsListLoading ?
+
+            Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF232428)), // Change the progress color
+                backgroundColor: Color(0xFFC3C3C3), // Change the background color
+              ),
+            ) :
 
 
   GridView.builder(
     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
       crossAxisCount: 2,
       crossAxisSpacing: 20,
-      mainAxisSpacing: 20,
+      mainAxisSpacing: 1,
     ),
     itemCount: filteredObservations.length,
     itemBuilder: (context, index) {
+      print('filteredObservations.length, ${filteredObservations.length}');
+
       return ObservationCard(
                         observationDate: filteredObservations[index].observedAt!.toString(),
                         radiologistName: filteredObservations[index].radiologistName!,

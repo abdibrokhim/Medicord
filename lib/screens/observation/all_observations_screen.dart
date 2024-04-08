@@ -268,13 +268,15 @@ class PatientRow extends StatelessWidget {
                         };
                         print('selected patient obs: $selected');
                 StoreProvider.of<GlobalState>(context).dispatch(SelectPatientAction(selected));
+                StoreProvider.of<GlobalState>(context).dispatch(SelectPatientObservationsAction(patient));
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ObservationsScreen(
-                      pId: patient.id!,
-                      observations: patient.observations!,
-                    ),
+                    builder: (context) => const ObservationsScreen(),
+                    // builder: (context) => ObservationsScreen(
+                    //   // pId: patient.id!,
+                    //   // observations: patient.observations!,
+                    // ),
                   ),
                 );
               },

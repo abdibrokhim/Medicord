@@ -17,6 +17,7 @@ import 'package:brainmri/models/patients_model.dart';
 import 'package:brainmri/store/app_logs.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
@@ -438,7 +439,7 @@ class UserService {
   }
 
 
-static Future<String> generatePatientReport(String pName, String bYear, ObservationModel observation) async {
+static Future<String> generatePatientReport(String pId, String pName, String bYear, ObservationModel observation) async {
   try {
     print('Generating patient report: ${pName}');
 
@@ -452,67 +453,126 @@ static Future<String> generatePatientReport(String pName, String bYear, Observat
 
 
     final pdf = pw.Document();
-
+    
     pdf.addPage(
       pw.MultiPage(
-        header: (context) => pw.Header(
-          level: 0,
-          child: pw.Column(
+        build: (context) => [
+          pw.Center(child: 
+          pw.Column(
             mainAxisAlignment: pw.MainAxisAlignment.center,
             children: [
-              pw.SizedBox(height: 16),
-              pw.Header(
-                level: 1,
-                child: pw.Center(child: 
-                  pw.Text(hospitalName, style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
-                ),
+              pw.Text(hospitalName, style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
+              pw.Divider(),
+          ],)
+            ),
+          pw.SizedBox(height: 4),
+          pw.Center(child: 
+                    pw.Column(
+            mainAxisAlignment: pw.MainAxisAlignment.center,
+            children: [
+              pw.Text(mriDepartment, style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
+            ]
+            ),
+            ),
+          pw.SizedBox(height: 24),
+          pw.Center(child: 
+            pw.Text(address, style: const pw.TextStyle(fontSize: 10)),
+          ),
+          pw.SizedBox(height: 24),
+         pw.Table(
+            border: pw.TableBorder.all(),
+            children: [
+              pw.TableRow(
+                children: [
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(4),
+                    child: 
+                  pw.Text('Patient fullname', style: const pw.TextStyle(fontSize: 12)),
+                    ),
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(4),
+                    child: 
+                  pw.Text('${pName}', style: const pw.TextStyle(fontSize: 12)),
+                    ),
+                ],
               ),
-              pw.SizedBox(height: 8),
-              pw.Header(
-                level: 1,
-                child: pw.Center(child: 
-                  pw.Text(mriDepartment, style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
-                ),
+              pw.TableRow(
+                children: [
+                                    pw.Padding(
+                    padding: const pw.EdgeInsets.all(4),
+                    child: 
+                  pw.Text('Patient birth year', style: const pw.TextStyle(fontSize: 12)),
+                                    ),
+                                                      pw.Padding(
+                    padding: const pw.EdgeInsets.all(4),
+                    child: 
+                  pw.Text('${bYear}', style: const pw.TextStyle(fontSize: 12)),
+                                                      ),
+                ],
               ),
-              pw.SizedBox(height: 24),
-              pw.Center(child: 
-                pw.Text(address, style: const pw.TextStyle(fontSize: 12)),
+              pw.TableRow(
+                children: [
+                                    pw.Padding(
+                    padding: const pw.EdgeInsets.all(4),
+                    child: 
+                  pw.Text('Date of observation', style: const pw.TextStyle(fontSize: 12)),
+                                    ),
+                                                      pw.Padding(
+                    padding: const pw.EdgeInsets.all(4),
+                    child: 
+                  pw.Text('${observation.observedAt != null ? '${formatDate(observation.observedAt!)}' : ''}', style: const pw.TextStyle(fontSize: 12)),
+                                                      ),
+                ],
+              ),
+              pw.TableRow(
+                children: [
+                                    pw.Padding(
+                    padding: const pw.EdgeInsets.all(4),
+                    child: 
+                  pw.Text('Radiologist fullname (observed by)', style: const pw.TextStyle(fontSize: 12)),
+                                    ),
+                                    pw.Padding(
+                    padding: const pw.EdgeInsets.all(4),
+                    child: 
+                  pw.Text('${observation.radiologistName!}', style: const pw.TextStyle(fontSize: 12)),
+                                    ),
+                ],
+              ),
+              pw.TableRow(
+                children: [
+                                    pw.Padding(
+                    padding: const pw.EdgeInsets.all(4),
+                    child: 
+                  pw.Text('Head doctor fullname (signed by)', style: const pw.TextStyle(fontSize: 12)),
+                                    ),
+                                                      pw.Padding(
+                    padding: const pw.EdgeInsets.all(4),
+                    child: 
+                  pw.Text('${observation.conclusion!.headDoctorName!}', style: const pw.TextStyle(fontSize: 12)),
+              ),
+                ],
               ),
             ],
           ),
-        ),
-        build: (context) => [
-          pw.SizedBox(height: 24),
-          pw.Text('Full Name: ${pName}', style: const pw.TextStyle(fontSize: 16)),
-          pw.Text('Birth Year: ${bYear}', style: const pw.TextStyle(fontSize: 16)),
-          pw.Text('Observed At: ${observation.observedAt != null ? '${_formatDate(observation.observedAt!)} OR ${formatDate(observation.observedAt!)}' : ''}', style: const pw.TextStyle(fontSize: 16)),
-          pw.Text('Radiologist Name: ${observation.radiologistName!}', style: const pw.TextStyle(fontSize: 16)),
-          pw.Text('Signed By (Head Doctor Name): ${observation.conclusion!.headDoctorName!}', style: const pw.TextStyle(fontSize: 16)),
           pw.SizedBox(height: 16),
-          pw.Header(
-            level: 1,
-            child: pw.Center(child: 
-              pw.Text('PROTOCOL OF MRI STUDY OF THE BRAIN', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+          pw.Center(child: 
+              pw.Text('PROTOCOL OF MRI STUDY OF THE BRAIN', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
             ),
-          ),
+          pw.SizedBox(height: 8),
+          pw.Text('${observation.text!}', style: const pw.TextStyle(fontSize: 12)),
           pw.SizedBox(height: 16),
-          pw.Text('${observation.text!}', style: const pw.TextStyle(fontSize: 14)),
-          pw.SizedBox(height: 16),
-          pw.Header(
-            level: 1,
-            child: pw.Center(child: 
-              pw.Text('Conclusion'.toUpperCase(), style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+          pw.Center(child: 
+              pw.Text('Conclusion'.toUpperCase(), style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
             ),
-          ),
-          pw.SizedBox(height: 16),
-          pw.Text(observation.conclusion!.text!, style: const pw.TextStyle(fontSize: 14)),
+          pw.SizedBox(height: 8),
+          pw.Text(observation.conclusion!.text!, style: const pw.TextStyle(fontSize: 12)),
           pw.SizedBox(height: 48),
           pw.Center(child: 
-            pw.Text(disclaimerA, style: const pw.TextStyle(fontSize: 12)),
+            pw.Text(disclaimerA, style: const pw.TextStyle(fontSize: 10)),
           ),
-          pw.SizedBox(height: 8),
+          pw.SizedBox(height: 4),
           pw.Center(child: 
-            pw.Text(disclaimerB, style: const pw.TextStyle(fontSize: 12)),
+            pw.Text(disclaimerB, style: const pw.TextStyle(fontSize: 10)),
           ),
         ],
       ),
@@ -537,9 +597,13 @@ static Future<String> generatePatientReport(String pName, String bYear, Observat
     print('File path: $filePath');
     print('File name: ${file.path}');
 
-    String fileUrl = await upload(filePath);
+    final String fileUrl = await upload(filePath);
 
     showToast(message: 'Report generated successfully', bgColor: getColor(AppColors.success));
+    
+    // Save the file URL to the Firebase Realtime Database
+    print('Saving report to firebase realtime database: $fileUrl');
+    await saveReportUrlFirebase(pId, observation.id!, fileUrl);
 
     return fileUrl;
 
@@ -549,6 +613,30 @@ static Future<String> generatePatientReport(String pName, String bYear, Observat
     return Future.error('Failed to generate patient report due to an exception: $e');
   }
 }
+
+static Future<bool> saveReportUrlFirebase(String patientId, String observationId, String reportUrl) async {
+    try {
+      print('Saving patientId: $patientId, observationId: $observationId, reportUrl: $reportUrl');
+
+      String? organizationId = await _getOrganizationId();
+      if (organizationId == null) {
+        return Future.error('No organization ID found');
+      }
+      DatabaseReference reportRef = _firebaseDatabase.ref().child('organizations').child(organizationId).child('patients').child(patientId).child('observations').child(observationId);
+      Map<String, Object?> jsonObject = {
+        'reportPath': reportUrl,
+      };
+      await reportRef.update(jsonObject);
+
+      showToast(message: 'Report saved successfully', bgColor: getColor(AppColors.success));
+
+      return true;
+    } catch (e) {
+      showToast(message: 'An error has occured', bgColor: getColor(AppColors.error));
+      AppLog.log().e('Error while Saving patient report: $e');
+      return Future.error('Error while Saving patient report: $e');
+    }
+  }
 
 
 static Future<String> upload(String path) async {
@@ -598,7 +686,7 @@ static Future<void> downloadFile(String reportUrl) async {
     Directory directory = await getApplicationDocumentsDirectory();
 
     // Set the file path to save the downloaded PDF
-    String fileName = 'DownloadedReport.pdf';
+    String fileName = 'report_${DateTime.now().millisecondsSinceEpoch}.pdf';
     String filePath = '${directory.path}/$fileName';
 
     // Use Dio to download the file

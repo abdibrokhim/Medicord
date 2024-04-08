@@ -1,23 +1,31 @@
 class BrainObservationModel {
   String scanningTechnique;
+  double minFocusDiameter;
+  double maxFocusDiameter;
   String basalGangliaLocation;
   String basalGangliaSymmetry;
   String basalGangliaContour;
   String basalGangliaDimensions;
   String basalGangliaSignal;
+  String lateralVentriclesSymmetry;
   double lateralVentriclesWidthRight;
   double lateralVentriclesWidthLeft;
   double thirdVentricleWidth;
   String sylvianAqueductCondition;
   String fourthVentricleCondition;
+  String cerebralLongitudinalFissureLocation;
+  String convexitalGroovesCondition;
   String corpusCallosumCondition;
   String brainStemCondition;
   String cerebellumCondition;
+  String cerebellarCortexWidthCondition;
   String craniovertebralJunctionCondition;
   String pituitaryGlandCondition;
+  double pituitaryGlandHeight;
   String orbitalConesShape;
   String eyeballsShapeSize;
   double opticNervesDiameter;
+  String perineuralSubarachnoidSpaceCondition;
   String extraocularMusclesCondition;
   String retrobulbarFattyTissueCondition;
   bool sinusesCystsPresence;
@@ -51,6 +59,17 @@ class BrainObservationModel {
     this.sinusesCystsSize = 0.0,
     this.sinusesPneumatization = '',
     this.additionalObservations = '',
+
+    this.minFocusDiameter = 0.0,
+    this.maxFocusDiameter = 0.0,
+    this.lateralVentriclesSymmetry = '',
+    this.cerebralLongitudinalFissureLocation = '',
+    this.convexitalGroovesCondition = '',
+    this.cerebellarCortexWidthCondition = '',
+    this.pituitaryGlandHeight = 0.0,
+    this.perineuralSubarachnoidSpaceCondition = '',
+
+
   });
 
 
@@ -81,6 +100,15 @@ class BrainObservationModel {
       sinusesCystsSize: 0.0,
       sinusesPneumatization: '',
       additionalObservations: '',
+
+      minFocusDiameter: 0.0,
+      maxFocusDiameter: 0.0,
+      lateralVentriclesSymmetry: '',
+      cerebralLongitudinalFissureLocation: '',
+      convexitalGroovesCondition: '',
+      cerebellarCortexWidthCondition: '',
+      pituitaryGlandHeight: 0.0,
+      perineuralSubarachnoidSpaceCondition: '',
     );
   }
 
@@ -111,35 +139,19 @@ class BrainObservationModel {
       sinusesCystsSize: observationForm.sinusesCystsSize,
       sinusesPneumatization: observationForm.sinusesPneumatization,
       additionalObservations: observationForm.additionalObservations,
+
+      minFocusDiameter: observationForm.minFocusDiameter,
+      maxFocusDiameter: observationForm.maxFocusDiameter,
+      lateralVentriclesSymmetry: observationForm.lateralVentriclesSymmetry,
+      cerebralLongitudinalFissureLocation: observationForm.cerebralLongitudinalFissureLocation,
+      convexitalGroovesCondition: observationForm.convexitalGroovesCondition,
+      cerebellarCortexWidthCondition: observationForm.cerebellarCortexWidthCondition,
+      pituitaryGlandHeight: observationForm.pituitaryGlandHeight,
+      perineuralSubarachnoidSpaceCondition: observationForm.perineuralSubarachnoidSpaceCondition,
+
     );
   }
 
-  bool get isFilled {
-    return scanningTechnique.isNotEmpty &&
-        basalGangliaLocation.isNotEmpty &&
-        basalGangliaSymmetry.isNotEmpty &&
-        basalGangliaContour.isNotEmpty &&
-        basalGangliaDimensions.isNotEmpty &&
-        basalGangliaSignal.isNotEmpty &&
-        lateralVentriclesWidthRight != 0.0 &&
-        lateralVentriclesWidthLeft != 0.0 &&
-        thirdVentricleWidth != 0.0 &&
-        sylvianAqueductCondition.isNotEmpty &&
-        fourthVentricleCondition.isNotEmpty &&
-        corpusCallosumCondition.isNotEmpty &&
-        brainStemCondition.isNotEmpty &&
-        cerebellumCondition.isNotEmpty &&
-        craniovertebralJunctionCondition.isNotEmpty &&
-        pituitaryGlandCondition.isNotEmpty &&
-        orbitalConesShape.isNotEmpty &&
-        eyeballsShapeSize.isNotEmpty &&
-        opticNervesDiameter != 0.0 &&
-        extraocularMusclesCondition.isNotEmpty &&
-        retrobulbarFattyTissueCondition.isNotEmpty &&
-        sinusesCystsSize != 0.0 &&
-        sinusesPneumatization.isNotEmpty &&
-        additionalObservations.isNotEmpty;
-  }
 
   factory BrainObservationModel.fromJson(Map<String, dynamic> json) {
     return BrainObservationModel(
@@ -168,6 +180,16 @@ class BrainObservationModel {
       sinusesCystsSize: json['sinusesCystsSize'],
       sinusesPneumatization: json['sinusesPneumatization'],
       additionalObservations: json['additionalObservations'],
+
+      minFocusDiameter: json['minFocusDiameter'],
+      maxFocusDiameter: json['maxFocusDiameter'],
+      lateralVentriclesSymmetry: json['lateralVentriclesSymmetry'],
+      cerebralLongitudinalFissureLocation: json['cerebralLongitudinalFissureLocation'],
+      convexitalGroovesCondition: json['convexitalGroovesCondition'],
+      cerebellarCortexWidthCondition: json['cerebellarCortexWidthCondition'],
+      pituitaryGlandHeight: json['pituitaryGlandHeight'],
+      perineuralSubarachnoidSpaceCondition: json['perineuralSubarachnoidSpaceCondition'],
+
     );
   }
 
@@ -198,6 +220,16 @@ class BrainObservationModel {
       'sinusesCystsSize': sinusesCystsSize,
       'sinusesPneumatization': sinusesPneumatization,
       'additionalObservations': additionalObservations,
+
+      'minFocusDiameter': minFocusDiameter,
+      'maxFocusDiameter': maxFocusDiameter,
+      'lateralVentriclesSymmetry': lateralVentriclesSymmetry,
+      'cerebralLongitudinalFissureLocation': cerebralLongitudinalFissureLocation,
+      'convexitalGroovesCondition': convexitalGroovesCondition,
+      'cerebellarCortexWidthCondition': cerebellarCortexWidthCondition,
+      'pituitaryGlandHeight': pituitaryGlandHeight,
+      'perineuralSubarachnoidSpaceCondition': perineuralSubarachnoidSpaceCondition,
+
     };
   }
 }

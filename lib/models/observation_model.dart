@@ -8,6 +8,7 @@ class ObservationModel {
     this.observedAt,
     this.radiologistName,
     this.conclusion,
+    this.reportPath,
   });
 
   factory ObservationModel.fromJson(Map<dynamic, dynamic> json) {
@@ -17,6 +18,7 @@ class ObservationModel {
       observedAt: json['observedAt'] != null ? DateTime.parse(json['observedAt']) : null,
       radiologistName: json['radiologistName'],
       conclusion: json['conclusion'],
+      reportPath: json['reportPath'],
     );
   }
 
@@ -25,6 +27,7 @@ class ObservationModel {
     'observedAt': observedAt?.toIso8601String(),
     'radiologistName': radiologistName,
     'conclusion': conclusion?.toJson(),
+    'reportPath': reportPath,
   };
 
 
@@ -33,6 +36,7 @@ class ObservationModel {
   final DateTime? observedAt;
   final String? radiologistName;
   final ConclusionModel? conclusion;
+  final String? reportPath;
 
   ObservationModel copyWith({
     String? id,
@@ -40,6 +44,7 @@ class ObservationModel {
     DateTime? observedAt,
     String? radiologistName,
     ConclusionModel? conclusion,
+    String? reportPath,
   }) {
     return ObservationModel(
       id: id ?? this.id,
@@ -47,6 +52,7 @@ class ObservationModel {
       observedAt: observedAt ?? this.observedAt,
       radiologistName: radiologistName ?? this.radiologistName,
       conclusion: conclusion ?? this.conclusion,
+      reportPath: reportPath ?? this.reportPath,
     );
   }
 }

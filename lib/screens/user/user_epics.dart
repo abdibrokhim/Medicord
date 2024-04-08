@@ -105,7 +105,7 @@ Stream<dynamic> geminiEpic(Stream<dynamic> actions, EpicStore<GlobalState> store
 Stream<dynamic> generateReportEpic(Stream<dynamic> actions, EpicStore<GlobalState> store) {
   return actions
       .where((action) => action is GenerateReportAction)
-      .asyncMap((action) => UserService.generatePatientReport(action.patientName, action.bYear, action.observation))
+      .asyncMap((action) => UserService.generatePatientReport(action.pId, action.pName, action.bYear, action.observation))
       .flatMap<dynamic>((value) => Stream.fromIterable([
             GenerateReportResponse(value),
           ]))
@@ -151,6 +151,20 @@ Stream<dynamic> fetchPatientSingleObservationEpic(Stream<dynamic> actions, EpicS
           ]));
 }
 
+
+// basic testing epics
+
+Stream<dynamic> saveReportUrlFirebaseEpic(Stream<dynamic> actions, EpicStore<GlobalState> store) {
+  return actions
+      .where((action) => action is SaveReportUrlFirebaseAction)
+      .asyncMap((action) => UserService.saveReportUrlFirebase(action.pId, action.oId, action.url))
+      .flatMap<dynamic>((value) => Stream.fromIterable([
+            SaveReportUrlFirebaseActionResponse(),
+          ]))
+      .onErrorResume((error, stackTrace) => Stream.fromIterable([
+            HandleGenericErrorAction('Error while fetching patients'),
+          ]));
+}
 
 
 
@@ -235,6 +249,9 @@ List<Stream<dynamic> Function(Stream<dynamic>, EpicStore<GlobalState>)> userEffe
   downloadReportEpic,
   fetchPatientAllObservationsEpic,
   fetchPatientSingleObservationEpic,
+
+  // basic testing epics
+  saveReportUrlFirebaseEpic,
 
   //==== simulations for testing purposes only ====//
   simulateGenerateConclusionResponseActionEpic,

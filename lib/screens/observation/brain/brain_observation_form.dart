@@ -61,7 +61,7 @@ int calculateLines(String text) {
       maxLines: null,
       textDirection: TextDirection.ltr,
     );
-    tp.layout(maxWidth: MediaQuery.of(context).size.width);
+    tp.layout(maxWidth: MediaQuery.of(context).size.width*0.7);
     print('maxlines: ${tp.computeLineMetrics().length}');
     return tp.computeLineMetrics().length;
   }
@@ -105,6 +105,18 @@ int calculateLines(String text) {
     addError(error: 'Basal ganglia signal is required');
   }
 
+  if (observation.cerebralLongitudinalFissureLocation.isEmpty) {
+    addError(error: 'Cerebral longitudinal fissure location is required');
+  }
+
+  if (observation.convexitalGroovesCondition.isEmpty) {
+    addError(error: 'Convexital grooves condition is required');
+  }
+
+  if (observation.lateralVentriclesSymmetry.isEmpty) {
+    addError(error: 'Lateral ventricles symmetry is required');
+  }
+
   if (observation.sylvianAqueductCondition.isEmpty) {
     addError(error: 'Sylvian aqueduct condition is required');
   }
@@ -125,6 +137,10 @@ int calculateLines(String text) {
     addError(error: 'Cerebellum condition is required');
   }
 
+  if (observation.cerebellarCortexWidthCondition.isEmpty) {
+    addError(error: 'Cerebellar cortex width condition is required');
+  }
+
   if (observation.craniovertebralJunctionCondition.isEmpty) {
     addError(error: 'Craniovertebral junction condition is required');
   }
@@ -141,6 +157,10 @@ int calculateLines(String text) {
     addError(error: 'Eyeballs shape and size are required');
   }
 
+  if (observation.perineuralSubarachnoidSpaceCondition.isEmpty) {
+    addError(error: 'Perineural subarachnoid space condition is required');
+  }
+
   if (observation.extraocularMusclesCondition.isEmpty) {
     addError(error: 'Extraocular muscles condition is required');
   }
@@ -152,6 +172,7 @@ int calculateLines(String text) {
   if (observation.sinusesPneumatization.isEmpty) {
     addError(error: 'Sinuses pneumatization is required');
   }
+
 
 }
 
@@ -173,50 +194,15 @@ int calculateLines(String text) {
   void _regenerateConclusion() {
     print('regenerate conclusion');
 
-        StoreProvider.of<GlobalState>(context).dispatch(
-      SimulateGenerateConclusionAction(),
-    );
-
-    //     // Below template, for testing purposes only
-//     // ------------ //
-    String observationString = """
-- Scanning Technique: T1 FSE-sagittal, T2 FLAIR, T2 FSE-axial, T2 FSE-coronal
-- Basal Ganglia:
-  - Location: Usually located
-  - Symmetry: Symmetrical
-  - Contour: Clear, even contours
-  - Dimensions: Not changed
-  - MR Signal: Not changed
-- Brain Grooves and Ventricles:
-  - Lateral Ventricles Width: Right: 7 mm, Left: 9 mm
-  - Third Ventricle Width: 4 mm
-  - Sylvian Aqueduct: Not changed
-  - Fourth Ventricle: Tent-shaped and not dilated
-- Brain Structures:
-  - Corpus Callosum: Normal shape and size
-  - Brain Stem: Without features
-  - Cerebellum: Normal shape
-  - Craniovertebral Junction: Unchanged
-  - Pituitary Gland: Normal shape, height 4 mm in sagittal projection
-- Optic Nerves and Orbital Structures:
-  - Orbital Cones Shape: Unchanged
-  - Eyeballs Shape and Size: Spherical and normal size
-  - Optic Nerves Diameter: Preserved
-  - Extraocular Muscles: Normal size, without pathological signals
-  - Retrobulbar Fatty Tissue: Without pathological signals
-- Paranasal Sinuses:
-  - Cysts Presence: Not mentioned
-  - Cysts Size: Not mentioned
-  - Sinuses Pneumatization: Usually pneumatized
-- Additional Observations: None mentioned
-""";
-// ------------ //
-    
-        // print('observationString: $observationString');
-
-    // StoreProvider.of<GlobalState>(context).dispatch(
-    //   GenerateConclusionAction(observationString),
+    //     StoreProvider.of<GlobalState>(context).dispatch(
+    //   SimulateGenerateConclusionAction(),
     // );
+
+        var state = StoreProvider.of<GlobalState>(context).state.appState.userState;
+
+    StoreProvider.of<GlobalState>(context).dispatch(
+      GenerateConclusionAction(state.observationString),
+    );
   }
 
   void _generateConclusion() {
@@ -224,69 +210,69 @@ int calculateLines(String text) {
     
 //     // Below template, for testing purposes only
 //     // ------------ //
-    String observationString = """
-- Scanning Technique: T1 FSE-sagittal, T2 FLAIR, T2 FSE-axial, T2 FSE-coronal
-- Basal Ganglia:
-  - Location: Usually located
-  - Symmetry: Symmetrical
-  - Contour: Clear, even contours
-  - Dimensions: Not changed
-  - MR Signal: Not changed
-- Brain Grooves and Ventricles:
-  - Lateral Ventricles Width: Right: 7 mm, Left: 9 mm
-  - Third Ventricle Width: 4 mm
-  - Sylvian Aqueduct: Not changed
-  - Fourth Ventricle: Tent-shaped and not dilated
-- Brain Structures:
-  - Corpus Callosum: Normal shape and size
-  - Brain Stem: Without features
-  - Cerebellum: Normal shape
-  - Craniovertebral Junction: Unchanged
-  - Pituitary Gland: Normal shape, height 4 mm in sagittal projection
-- Optic Nerves and Orbital Structures:
-  - Orbital Cones Shape: Unchanged
-  - Eyeballs Shape and Size: Spherical and normal size
-  - Optic Nerves Diameter: Preserved
-  - Extraocular Muscles: Normal size, without pathological signals
-  - Retrobulbar Fatty Tissue: Without pathological signals
-- Paranasal Sinuses:
-  - Cysts Presence: Not mentioned
-  - Cysts Size: Not mentioned
-  - Sinuses Pneumatization: Usually pneumatized
-- Additional Observations: None mentioned
-""";
+//     String observationString = """
+// - Scanning Technique: T1 FSE-sagittal, T2 FLAIR, T2 FSE-axial, T2 FSE-coronal
+// - Basal Ganglia:
+//   - Location: Usually located
+//   - Symmetry: Symmetrical
+//   - Contour: Clear, even contours
+//   - Dimensions: Not changed
+//   - MR Signal: Not changed
+// - Brain Grooves and Ventricles:
+//   - Lateral Ventricles Width: Right: 7 mm, Left: 9 mm
+//   - Third Ventricle Width: 4 mm
+//   - Sylvian Aqueduct: Not changed
+//   - Fourth Ventricle: Tent-shaped and not dilated
+// - Brain Structures:
+//   - Corpus Callosum: Normal shape and size
+//   - Brain Stem: Without features
+//   - Cerebellum: Normal shape
+//   - Craniovertebral Junction: Unchanged
+//   - Pituitary Gland: Normal shape, height 4 mm in sagittal projection
+// - Optic Nerves and Orbital Structures:
+//   - Orbital Cones Shape: Unchanged
+//   - Eyeballs Shape and Size: Spherical and normal size
+//   - Optic Nerves Diameter: Preserved
+//   - Extraocular Muscles: Normal size, without pathological signals
+//   - Retrobulbar Fatty Tissue: Without pathological signals
+// - Paranasal Sinuses:
+//   - Cysts Presence: Not mentioned
+//   - Cysts Size: Not mentioned
+//   - Sinuses Pneumatization: Usually pneumatized
+// - Additional Observations: None mentioned
+// """;
 // ------------ //
 
 
 fillErrorList();
 
-if (!errors.isNotEmpty) {
+if (errors.isNotEmpty) {  // remove '!' in production
   showErrorBottomSheet(context, errors);
 } else {
 
-    StoreProvider.of<GlobalState>(context).dispatch(
-      SimulateGenerateConclusionAction(),
-    );
+    // StoreProvider.of<GlobalState>(context).dispatch(
+    //   SimulateGenerateConclusionAction(),
+    // );
 
 
-//     print('observation: ${observation.toJson()}');
+    print('observation: ${observation.toJson()}');
 
-//     String observationString = fillObservationTemplate(observation);
+    String observationString = fillObservationTemplate(observation);
 
         print('observationString: $observationString');
 
-    print('generating conclusion');
-
-    // StoreProvider.of<GlobalState>(context).dispatch(
-    //   SaveObservationAction(observationString),
-    // );
+      print('saving observationString');
+    StoreProvider.of<GlobalState>(context).dispatch(
+      SaveObservationAction(observationString),
+    );
 
     // delay 2 seconds to save observationString
-    // Future.delayed(const Duration(seconds: 2));
+    Future.delayed(const Duration(seconds: 2));
     
-    // StoreProvider.of<GlobalState>(context).dispatch(
-    //   GenerateConclusionAction(observationString),
-    // );
+    print('generating conclusion');
+    StoreProvider.of<GlobalState>(context).dispatch(
+      GenerateConclusionAction(observationString),
+    );
 
     showSubmitBottomSheet(context);
 
@@ -308,7 +294,7 @@ if (!errors.isNotEmpty) {
       builder: (context, userState) {
         return
       Container(
-        height: 800,
+        height: 900,
         padding: const EdgeInsets.only(left: 16.0, right: 16.0),
         color: const Color.fromARGB(255, 31, 33, 38),
         child: SingleChildScrollView(
@@ -408,6 +394,8 @@ userState.conclusion.isNotEmpty ?
     onPressed: (userState.isGeneratingConclusion || userState.isSavingObservation) ? () {} : _submitForm,
     loading: userState.isSavingObservation,
   ),
+  
+  const SizedBox(height: 32.0),
 
           ],
         ),
@@ -562,27 +550,27 @@ if (errors.isNotEmpty) {
 
     // simulate submit form
 
+    // StoreProvider.of<GlobalState>(context).dispatch(
+    //   SimulateSavePatientObservationAction(),
+    // );
+        // }
+        final ObservationModel newOb = ObservationModel(
+      conclusion: ConclusionModel(
+        text: state.conclusion,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+        isValidated: true,
+        isApproved: false,
+      ),
+      text: state.observationString,
+      radiologistName: radiologistNameController.text,
+      observedAt: DateTime.now(),
+    );
+
     StoreProvider.of<GlobalState>(context).dispatch(
-      SimulateSavePatientObservationAction(),
+      SavePatientObservationAction(state.selectedPatient['id']! , newOb),
     );
         }
-    //     final ObservationModel newOb = ObservationModel(
-    //   conclusion: ConclusionModel(
-    //     text: state.conclusion,
-    //     createdAt: DateTime.now(),
-    //     updatedAt: DateTime.now(),
-    //     isValidated: true,
-    //     isApproved: false,
-    //   ),
-    //   text: state.observationString,
-    //   radiologistName: radiologistNameController.text,
-    //   observedAt: DateTime.now(),
-    // );
-
-    // StoreProvider.of<GlobalState>(context).dispatch(
-    //   SavePatientObservationAction(state.selectedPatient['id']! , newOb),
-    // );
-    //     }
 
     // Navigator.of(context).pop();
   }
@@ -671,6 +659,22 @@ CustomTextFormField(
   onClear: () => setState(() => observation.scanningTechnique = ''),
   initialValue: observation.scanningTechnique,
 ),
+const SizedBox(height: 14.0),
+CustomTextFormField(
+  labelText: 'Minimum Focus Diameter (mm)',
+  isInputEmpty: observation.minFocusDiameter == 0.0,
+  onChanged: (value) => setState(() => observation.minFocusDiameter = double.tryParse(value) ?? 0.0),
+  onClear: () => setState(() => observation.minFocusDiameter = 0.0),
+  initialValue: observation.minFocusDiameter.toString(),
+),
+const SizedBox(height: 14.0),
+CustomTextFormField(
+  labelText: 'Maximum Focus Diameter (mm)',
+  isInputEmpty: observation.maxFocusDiameter == 0.0,
+  onChanged: (value) => setState(() => observation.maxFocusDiameter = double.tryParse(value) ?? 0.0),
+  onClear: () => setState(() => observation.maxFocusDiameter = 0.0),
+  initialValue: observation.maxFocusDiameter.toString(),
+),
 
 const SizedBox(height: 24.0),
 
@@ -744,6 +748,14 @@ Text(
 ),),
 const SizedBox(height: 14.0),
 CustomTextFormField(
+  labelText: 'Lateral Ventricles Symmetry',
+  isInputEmpty: observation.lateralVentriclesSymmetry.isEmpty,
+  onChanged: (value) => setState(() => observation.lateralVentriclesSymmetry = value),
+  onClear: () => setState(() => observation.lateralVentriclesSymmetry = ''),
+  initialValue: observation.lateralVentriclesSymmetry,
+),
+const SizedBox(height: 14.0),
+CustomTextFormField(
   labelText: 'Lateral Ventricles Width Right (mm)',
   isInputEmpty: observation.lateralVentriclesWidthRight == 0.0,
   onChanged: (value) => setState(() => observation.lateralVentriclesWidthRight = double.tryParse(value) ?? 0.0),
@@ -768,6 +780,14 @@ CustomTextFormField(
 ),
 const SizedBox(height: 14.0),
 CustomTextFormField(
+  labelText: 'Cerebral Longitudinal Fissure Location',
+  isInputEmpty: observation.cerebralLongitudinalFissureLocation.isEmpty,
+  onChanged: (value) => setState(() => observation.cerebralLongitudinalFissureLocation = value),
+  onClear: () => setState(() => observation.cerebralLongitudinalFissureLocation = ''),
+  initialValue: observation.cerebralLongitudinalFissureLocation,
+),
+const SizedBox(height: 14.0),
+CustomTextFormField(
   labelText: 'Sylvian Aqueduct Condition',
   isInputEmpty: observation.sylvianAqueductCondition.isEmpty,
   onChanged: (value) => setState(() => observation.sylvianAqueductCondition = value),
@@ -781,6 +801,14 @@ CustomTextFormField(
   onChanged: (value) => setState(() => observation.fourthVentricleCondition = value),
   onClear: () => setState(() => observation.fourthVentricleCondition = ''),
   initialValue: observation.fourthVentricleCondition,
+),
+const SizedBox(height: 14.0),
+CustomTextFormField(
+  labelText: 'Convexital Grooves Condition',
+  isInputEmpty: observation.convexitalGroovesCondition.isEmpty,
+  onChanged: (value) => setState(() => observation.convexitalGroovesCondition = value),
+  onClear: () => setState(() => observation.convexitalGroovesCondition = ''),
+  initialValue: observation.convexitalGroovesCondition,
 ),
 ],),
 
@@ -825,6 +853,14 @@ CustomTextFormField(
 ),
 const SizedBox(height: 14.0),
 CustomTextFormField(
+  labelText: 'Cerebellar Cortex Width Condition',
+  isInputEmpty: observation.cerebellarCortexWidthCondition.isEmpty,
+  onChanged: (value) => setState(() => observation.cerebellarCortexWidthCondition = value),
+  onClear: () => setState(() => observation.cerebellarCortexWidthCondition = ''),
+  initialValue: observation.cerebellarCortexWidthCondition,
+),
+const SizedBox(height: 14.0),
+CustomTextFormField(
   labelText: 'Craniovertebral Junction Condition',
   isInputEmpty: observation.craniovertebralJunctionCondition.isEmpty,
   onChanged: (value) => setState(() => observation.craniovertebralJunctionCondition = value),
@@ -838,6 +874,14 @@ CustomTextFormField(
   onChanged: (value) => setState(() => observation.pituitaryGlandCondition = value),
   onClear: () => setState(() => observation.pituitaryGlandCondition = ''),
   initialValue: observation.pituitaryGlandCondition,
+),
+const SizedBox(height: 14.0),
+CustomTextFormField(
+  labelText: 'Pituitary Gland Height (mm)',
+  isInputEmpty: observation.pituitaryGlandHeight == 0.0,
+  onChanged: (value) => setState(() => observation.pituitaryGlandHeight = double.tryParse(value) ?? 0.0),
+  onClear: () => setState(() => observation.pituitaryGlandHeight = 0.0),
+  initialValue: observation.pituitaryGlandHeight.toString(),
 ),
 ],),
 
@@ -879,6 +923,14 @@ CustomTextFormField(
   onChanged: (value) => setState(() => observation.opticNervesDiameter = double.tryParse(value) ?? 0.0),
   onClear: () => setState(() => observation.opticNervesDiameter = 0.0),
   initialValue: observation.opticNervesDiameter.toString(),
+),
+const SizedBox(height: 14.0),
+CustomTextFormField(
+  labelText: 'Perineural Subarachnoid Space Condition',
+  isInputEmpty: observation.perineuralSubarachnoidSpaceCondition.isEmpty,
+  onChanged: (value) => setState(() => observation.perineuralSubarachnoidSpaceCondition = value),
+  onClear: () => setState(() => observation.perineuralSubarachnoidSpaceCondition = ''),
+  initialValue: observation.perineuralSubarachnoidSpaceCondition,
 ),
 const SizedBox(height: 14.0),
 CustomTextFormField(

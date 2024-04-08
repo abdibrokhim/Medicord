@@ -2,6 +2,7 @@ import 'package:brainmri/models/observation_model.dart';
 import 'package:brainmri/models/patients_model.dart';
 import 'package:brainmri/screens/observation/components/custom_text_field.dart';
 import 'package:brainmri/screens/observation/components/custom_textformfield.dart';
+import 'package:brainmri/screens/observation/components/primary_custom_button.dart';
 import 'package:brainmri/screens/user/user_reducer.dart';
 import 'package:brainmri/store/app_store.dart';
 import 'package:brainmri/utils/refreshable.dart';
@@ -24,7 +25,7 @@ import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
       maxLines: null,
       textDirection: TextDirection.ltr,
     );
-    tp.layout(maxWidth: MediaQuery.of(context).size.width);
+    tp.layout(maxWidth: MediaQuery.of(context).size.width*0.7);
     print(tp.computeLineMetrics().length);
     return tp.computeLineMetrics().length;
   }
@@ -44,7 +45,6 @@ import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
                       return 
                       StoreConnector<GlobalState, List<PatientModel>>(
       onInit: (store) {
-        // store.dispatch(FetchAllPatientNamesAction());
       },
       converter: (appState) => appState.state.appState.userState.patientsList,
       builder: (context, pList) {
@@ -52,12 +52,12 @@ import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
         return
           Container(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        height: 600,
+        height: 800,
         color: const Color.fromARGB(255, 31, 33, 38),
                       child:
                       Padding(
                   padding: const EdgeInsets.only(top: 24.0),
-                  child: 
+                  child: SingleChildScrollView(child: 
                         Column(
                           mainAxisSize: MainAxisSize.min,
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -142,6 +142,7 @@ print('Updating conclusion...');
         await Future.delayed(Duration(seconds: 2) , () {
           print('Fetching updated single observation...');
           StoreProvider.of<GlobalState>(context).dispatch(FetchPatientSingleObservation(paId, obId));
+          print('SingleObservationBottomSheet updated(): ${store.state.appState.userState.patientsAllObservations!.id!}');
         });
 
       // reFetchData();
@@ -178,7 +179,9 @@ print('Updating conclusion...');
   ),
 ),
 ),
+const SizedBox(height: 60,),
                           ],
+),
                         ),
                         ),
                       );
@@ -213,6 +216,8 @@ class SingleObservationBottomSheet extends StatelessWidget {
         print('Fetching single observation...');
         
       StoreProvider.of<GlobalState>(context).dispatch(FetchPatientSingleObservation(pId, observation.id!));
+      print('Fetched single observation.');
+      print('SingleObservationBottomSheet reFetchData(): ${store.state.appState.userState.patientsAllObservations!.id!}');
   }
 
 
@@ -231,7 +236,16 @@ class SingleObservationBottomSheet extends StatelessWidget {
     _refreshController.loadComplete();
   }
 
-    return 
+    return StoreConnector<GlobalState, UserState>(
+      onInit: (store) {
+        print('init state');
+        print('report path: ${observation.reportPath}');
+        // store.dispatch(FetchPatientAllObservations(widget.pId));
+      },
+      converter: (appState) => appState.state.appState.userState,
+      builder: (context, userState) {
+        
+        return
       Container(
         height: 800,
         padding: const EdgeInsets.only(left: 16.0, right: 16.0),
@@ -279,6 +293,13 @@ Expanded(
             onRefresh: _onRefresh,
             onLoading: _onLoading,
             child: 
+            userState.isFetchPatientSingleObservation ?
+            Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF232428)), // Change the progress color
+                backgroundColor: Color(0xFFC3C3C3), // Change the background color
+              ),
+            ) :
  ListView(
           children: [
 
@@ -325,6 +346,11 @@ CustomTextField(
                   child:
           ElevatedButton(
   onPressed: () {
+    if (!observation.conclusion!.isApproved!) {
+      showToast(message: 'Approve the observation first.', bgColor: Colors.red[900]);
+      print('Approve the observation first.');
+    } else {
+
     var state = StoreProvider.of<GlobalState>(context).state.appState.userState;
     String pName = state.selectedPatient['name']!;
     String bYear = state.selectedPatient['birthYear']!;
@@ -338,10 +364,12 @@ CustomTextField(
 
 
     store.dispatch(
-        GenerateReportAction(pName, bYear, observation),
+        GenerateReportAction(pId, pName, bYear, observation),
       );
 
     showReportActionBottomSheet(context);
+
+    }
   },
   style: ElevatedButton.styleFrom(
     elevation: 5,
@@ -366,6 +394,39 @@ CustomTextField(
   ),
 ),
 ),
+const SizedBox(height: 20,),
+                
+                Text("Or".toUpperCase(), 
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                ),),
+                const SizedBox(height: 20,),
+PrimaryCustomButton(
+  label: 'Download last report',
+  loading: store.state.appState.userState.isDownloadingReport,
+  onPressed: (store.state.appState.userState.isDownloadingReport) ? () {} : () async {
+    var state = StoreProvider.of<GlobalState>(context).state.appState.userState;
+    String path = observation.reportPath ?? '';
+
+    print('report path: $path');
+
+    if (path.isNotEmpty) {
+      print('Downloading report...');
+
+      StoreProvider.of<GlobalState>(context).dispatch(
+        DownloadReportAction(path),
+      );
+    } else {
+      showToast(message: 'No report to download.', bgColor: Colors.red[900]);
+      print('No report to download. Generate a report first.');
+    }
+  },
+
+),
+
 const SizedBox(height: 60.0),
           ],
 ),
@@ -374,6 +435,8 @@ const SizedBox(height: 60.0),
           ],
         ),
       );
+      },
+    );
   }
 }
 
@@ -556,7 +619,7 @@ print('Approving conclusion...');
 
     var state = StoreProvider.of<GlobalState>(context).state.appState.userState;
 
-    String path = state.reportPath;
+    final String path = state.reportPath;
 
   showModalBottomSheet(
     isScrollControlled: true,
@@ -652,6 +715,8 @@ userState.isGeneratingReport ?
                   child:
           ElevatedButton(
   onPressed: (userState.isGeneratingReport || userState.isDownloadingReport) ? () {} : () async {
+    print('Downloading report...');
+    print('Path: $path');
     
     if (path.isNotEmpty) {
     StoreProvider.of<GlobalState>(context).dispatch(
