@@ -14,10 +14,12 @@ void showErrorBottomSheet(BuildContext context, List<String> errors) {
     builder: (BuildContext context) {
         return
       Container(
-        height: errors.length > 5 ? 800 : 400,
-        padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 0.0, bottom: 0.0),
+        height: 800,
         color: const Color.fromARGB(255, 31, 33, 38),
-        child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 0.0, bottom: 0.0),
+          child:
+        SingleChildScrollView(
           child:
         Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -89,6 +91,7 @@ Column(
 const SizedBox(height: 60),
           ],
         ), 
+        ),
         ),
       );
     },

@@ -12,6 +12,6 @@
 abstract class Environments {
   // static String backendServiceBaseUrl = 'http://0.0.0.0:8000';
   static String backendServiceBaseUrl = 'https://mysite-egu6.onrender.com';
-  static String appName = 'BrAIn MRI';
+  static String appName = 'CoMed';
   static String showDebugBanner = 'false';
 }

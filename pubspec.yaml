@@ -53,6 +53,8 @@ dependencies:
   open_file: ^3.3.2
   firebase_storage: ^11.6.6
   google_fonts: ^6.2.0
+  downloads_path_provider_28: ^0.1.2
+  permission_handler: ^11.3.1
 
 dev_dependencies:
   flutter_test:

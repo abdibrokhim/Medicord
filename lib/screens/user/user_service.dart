@@ -23,6 +23,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:downloads_path_provider_28/downloads_path_provider_28.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 
 class UserService {
@@ -677,33 +679,41 @@ static Future<String> upload(String path) async {
   }
 }
 
-
-static Future<void> downloadFile(String reportUrl) async {
-  try {
-    print('Downloading file from URL: $reportUrl');
-
-    // Get the application documents directory
-    Directory directory = await getApplicationDocumentsDirectory();
-
-    // Set the file path to save the downloaded PDF
-    String fileName = 'report_${DateTime.now().millisecondsSinceEpoch}.pdf';
-    String filePath = '${directory.path}/$fileName';
-
-    // Use Dio to download the file
-    Dio dio = Dio();
-    await dio.download(reportUrl, filePath);
-
-    AppLog.log().e('File downloaded to: $filePath');
-
-    // Open the file (optional)
-    await OpenFile.open(filePath);
-
-  } catch (e) {
-    showToast(message: 'An error has occured', bgColor: getColor(AppColors.error));
-    AppLog.log().e('Error while downloading file: $e');
-    throw Exception('Error while downloading file: $e');
+static Future<Directory?> _getDownloadDirectory() async {
+    if (Platform.isAndroid) {
+      return await getExternalStorageDirectory();
+    } else {
+      // For iOS, use the application documents directory
+      return await getApplicationDocumentsDirectory();
+    }
   }
-}
+
+  static Future<void> downloadFile(String reportUrl) async {
+    try {
+      // Get the download directory
+      Directory? directory = await _getDownloadDirectory();
+      if (directory == null) {
+        throw Exception('Cannot find the download directory');
+      }
+
+      // Set the file path to save the downloaded PDF
+      String fileName = 'report_${DateTime.now().millisecondsSinceEpoch}.pdf';
+      String filePath = '${directory.path}/$fileName';
+
+      // Use Dio to download the file
+      Dio dio = Dio();
+      await dio.download(reportUrl, filePath);
+
+      print('File downloaded to: $filePath');
+
+      // Open the file (optional)
+      await OpenFile.open(filePath);
+    } catch (e) {
+      print('Error while downloading file: $e');
+      throw Exception('Error while downloading file: $e');
+    }
+  }
+
 
 
 
