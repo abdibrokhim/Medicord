@@ -231,7 +231,7 @@ int calculateLines(String text) {
 // ------------ //
 
 
-fillErrorList();
+fillErrorList();  // uncomment in production
 
 if (errors.isNotEmpty) {  // remove '!' in production
   showErrorBottomSheet(context, errors);

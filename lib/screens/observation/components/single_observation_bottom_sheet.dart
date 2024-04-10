@@ -686,6 +686,29 @@ const SizedBox(height: 16),
                               ),
                             ),
                             const SizedBox(height: 24),
+        // info
+
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [ 
+          IconButton(
+            onPressed: () {
+              List<String> content = [
+                'If you generated report successfully, but could not Download it, please refresh the screen and try again.',
+                'You may click on Download last report to download the last generated report.',
+                'Updates may take a few seconds to reflect. Usually from 5 to 10 seconds.',
+              ];
+              int state = 0; // 0 => info
+              String label = 'Quick Info';
+              String infoText = 'Please read the following information carefully. It applies to the whole app.';
+              Color bgColor = Color(0xFFCBF3FF);
+              Color txtColor = Colors.blue[900]!;
+              showMixedBottomSheet(context, content, state, label, infoText, bgColor, txtColor);
+            }, 
+            icon: Icon(Icons.info_outline_rounded, color: Colors.white),
+          ),
+        ],
+        ),
 
 userState.isGeneratingReport ?
   const Column(
@@ -723,6 +746,7 @@ userState.isGeneratingReport ?
         DownloadReportAction(path),
       );
     } else {
+      showToast(message: 'No report to download.', bgColor: Colors.red[900]);
       print('No report to download.');
     }
 

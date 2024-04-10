@@ -497,13 +497,14 @@ class UserService {
   }
 
   static Future<String> gpt(String observation) async {
+    String language = 'English';
     try {
       final response = await http.post(
         Uri.parse('${Environments.backendServiceBaseUrl}/api/gpt-fine-tuned/conclusion'),
         headers: {
           'Content-Type': 'application/json',
         },
-        body: json.encode({'query': observation}),
+        body: json.encode({'query': observation, 'language': language}),
       );
       if (response.statusCode == 200) {
         final dynamic data = json.decode(response.body);
