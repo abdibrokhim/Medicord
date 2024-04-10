@@ -92,10 +92,22 @@ Stream<dynamic> fetchAllPatientNamesEpic(Stream<dynamic> actions, EpicStore<Glob
 
 Stream<dynamic> geminiEpic(Stream<dynamic> actions, EpicStore<GlobalState> store) {
   return actions
-      .where((action) => action is GenerateConclusionAction)
+      .where((action) => action is GeminiGenerateConclusionAction)
       .asyncMap((action) => UserService.gemini(action.observation))
       .flatMap<dynamic>((value) => Stream.fromIterable([
-            GenerateConclusionResponse(value),
+            GeminiGenerateConclusionResponse(value),
+          ]))
+      .onErrorResume((error, stackTrace) => Stream.fromIterable([
+            HandleGenericErrorAction('Error while fetching patient names'),
+          ]));
+}
+
+Stream<dynamic> gptEpic(Stream<dynamic> actions, EpicStore<GlobalState> store) {
+  return actions
+      .where((action) => action is GptGenerateConclusionAction)
+      .asyncMap((action) => UserService.gpt(action.observation))
+      .flatMap<dynamic>((value) => Stream.fromIterable([
+            GptGenerateConclusionResponse(value),
           ]))
       .onErrorResume((error, stackTrace) => Stream.fromIterable([
             HandleGenericErrorAction('Error while fetching patient names'),
@@ -148,6 +160,30 @@ Stream<dynamic> fetchPatientSingleObservationEpic(Stream<dynamic> actions, EpicS
           ]))
       .onErrorResume((error, stackTrace) => Stream.fromIterable([
             HandleGenericErrorAction('Error while fetching patient names'),
+          ]));
+}
+
+Stream<dynamic> fetchOrganizationEpic(Stream<dynamic> actions, EpicStore<GlobalState> store) {
+  return actions
+      .where((action) => action is FetchOrganizationAction)
+      .asyncMap((action) => UserService.fetchOrganizationDetails())
+      .flatMap<dynamic>((value) => Stream.fromIterable([
+            FetchOrganizationResponse(value),
+          ]))
+      .onErrorResume((error, stackTrace) => Stream.fromIterable([
+            HandleGenericErrorAction('Error while fetching organization details'),
+          ]));
+}
+
+Stream<dynamic> saveOrganizationDetailsEpic(Stream<dynamic> actions, EpicStore<GlobalState> store) {
+  return actions
+      .where((action) => action is SaveOrganizationDetailsAction)
+      .asyncMap((action) => UserService.saveOrganizationDetails(action.organization))
+      .flatMap<dynamic>((value) => Stream.fromIterable([
+            SaveOrganizationDetailsResponse(value),
+          ]))
+      .onErrorResume((error, stackTrace) => Stream.fromIterable([
+            HandleGenericErrorAction('Error while fetching organization details'),
           ]));
 }
 
@@ -245,10 +281,13 @@ List<Stream<dynamic> Function(Stream<dynamic>, EpicStore<GlobalState>)> userEffe
   saveNewPatientEpic,
   fetchAllPatientNamesEpic,
   geminiEpic,
+  gptEpic,
   generateReportEpic,
   downloadReportEpic,
   fetchPatientAllObservationsEpic,
   fetchPatientSingleObservationEpic,
+  fetchOrganizationEpic,
+  saveOrganizationDetailsEpic,
 
   // basic testing epics
   saveReportUrlFirebaseEpic,

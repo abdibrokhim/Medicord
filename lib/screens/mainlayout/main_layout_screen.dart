@@ -32,6 +32,7 @@ class _MainLayoutState extends State<MainLayout> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         surfaceTintColor: const Color.fromARGB(255, 23, 24, 28),
@@ -145,6 +146,8 @@ DrawerHeader(
     ],
   ),
   ),
+  
+const SizedBox(height: 24),
   Padding(padding: const EdgeInsets.only(bottom: 20.0), // Added padding to version info
   child: 
       Text(

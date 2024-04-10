@@ -200,8 +200,14 @@ int calculateLines(String text) {
 
         var state = StoreProvider.of<GlobalState>(context).state.appState.userState;
 
+    // Gemini model
+    // StoreProvider.of<GlobalState>(context).dispatch(
+    //   GeminiGenerateConclusionAction(state.observationString),
+    // );
+
+        // GPT model
     StoreProvider.of<GlobalState>(context).dispatch(
-      GenerateConclusionAction(state.observationString),
+      GptGenerateConclusionAction(state.observationString),
     );
   }
 
@@ -211,35 +217,16 @@ int calculateLines(String text) {
 //     // Below template, for testing purposes only
 //     // ------------ //
 //     String observationString = """
-// - Scanning Technique: T1 FSE-sagittal, T2 FLAIR, T2 FSE-axial, T2 FSE-coronal
-// - Basal Ganglia:
-//   - Location: Usually located
-//   - Symmetry: Symmetrical
-//   - Contour: Clear, even contours
-//   - Dimensions: Not changed
-//   - MR Signal: Not changed
-// - Brain Grooves and Ventricles:
-//   - Lateral Ventricles Width: Right: 7 mm, Left: 9 mm
-//   - Third Ventricle Width: 4 mm
-//   - Sylvian Aqueduct: Not changed
-//   - Fourth Ventricle: Tent-shaped and not dilated
-// - Brain Structures:
-//   - Corpus Callosum: Normal shape and size
-//   - Brain Stem: Without features
-//   - Cerebellum: Normal shape
-//   - Craniovertebral Junction: Unchanged
-//   - Pituitary Gland: Normal shape, height 4 mm in sagittal projection
-// - Optic Nerves and Orbital Structures:
-//   - Orbital Cones Shape: Unchanged
-//   - Eyeballs Shape and Size: Spherical and normal size
-//   - Optic Nerves Diameter: Preserved
-//   - Extraocular Muscles: Normal size, without pathological signals
-//   - Retrobulbar Fatty Tissue: Without pathological signals
-// - Paranasal Sinuses:
-//   - Cysts Presence: Not mentioned
-//   - Cysts Size: Not mentioned
-//   - Sinuses Pneumatization: Usually pneumatized
-// - Additional Observations: None mentioned
+// Scanning technique: T1 FSE-sagital, T2 FLAIR, T2 FSE-axial, T2 FSE-coronar, DWI.
+// On a series of tomograms in the structure of the subcortical and periventricular white matter of the cerebral hemispheres on both sides, multiple round-shaped foci of pathological intensity are asymmetrically determined, with unclear contours, homogeneous hyperintense signal characteristics on T2 VI and T2 FLAIR, with a diameter of 3-10 mm.
+// The basal ganglia are usually located, symmetrical, with clear, even contours, the dimensions are not changed. The MR signal of the nuclei was not changed.
+// The longitudinal fissure of the cerebrum is located centrally. Convexital grooves are moderately widened in the frontotemporal regions on both sides due to atrophy of the adjacent parts of the brain
+// The lateral ventricles are symmetrical, the width of the ventricles at the level of the foramen of Monro is 10 mm on the right, 14 mm on the left. The third ventricle is 4 mm wide. Sylvian aqueduct has not been changed. The fourth ventricle is tent-shaped and not dilated.
+// The corpus callosum is of normal shape and size. The brain stem is without areas of pathological intensity. The cerebellum is of normal shape, the signal characteristics of the white matter are not changed. The width of the cerebellar cortex is reduced due to atrophy. The craniovertebral junction is unchanged.
+// The pituitary gland is moderately flattened, the height in the sagittal projection is 3 mm. The pituitary stalk is located centrally. The chiasma of the optic nerves is located usually, the contours are clear and even. Parasellar cisterns without areas of pathological intensity. The siphons of the internal carotid artery are not changed. The cavernous sinuses of both carotid arteries are symmetrical, with clear, even contours.
+// The shape of the orbital cones on both sides is unchanged. The eyeballs are spherical in shape and of normal size. The signal characteristics of the vitreous body are not changed. The diameter of the optic nerves is not changed. The perineural subarachnoid space of the orbits is moderately diffusely dilated. The extraocular muscles are of normal size, the structure is without pathological signals. Retrobulbar fatty tissue without pathological signals.
+// Region of the cerebellopontine angle: the prevestocochlear nerve is clearly differentiated on both sides. Pneumatization of the mastoid processes of the temporal bones is preserved.
+// A cyst with a diameter of 14 mm is identified in the left maxillary sinus. The remaining paranasal sinuses are usually pneumatized.
 // """;
 // ------------ //
 
@@ -270,8 +257,15 @@ if (errors.isNotEmpty) {  // remove '!' in production
     Future.delayed(const Duration(seconds: 2));
     
     print('generating conclusion');
+    
+    // Gemini model
+    // StoreProvider.of<GlobalState>(context).dispatch(
+    //   GeminiGenerateConclusionAction(observationString),
+    // );
+    
+    // GPT model
     StoreProvider.of<GlobalState>(context).dispatch(
-      GenerateConclusionAction(observationString),
+      GptGenerateConclusionAction(observationString),
     );
 
     showSubmitBottomSheet(context);
@@ -294,7 +288,7 @@ if (errors.isNotEmpty) {  // remove '!' in production
       builder: (context, userState) {
         return
       Container(
-        height: 900,
+        height: 800,
         padding: const EdgeInsets.only(left: 16.0, right: 16.0),
         color: const Color.fromARGB(255, 31, 33, 38),
         child: SingleChildScrollView(
@@ -335,6 +329,8 @@ if (errors.isNotEmpty) {  // remove '!' in production
 ),
           
 const SizedBox(height: 32.0),
+
+
 
 userState.isGeneratingConclusion ?
   const Column(

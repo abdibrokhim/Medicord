@@ -2,6 +2,7 @@ import 'package:brainmri/models/conclusion_model.dart';
 import 'package:brainmri/models/observation_model.dart';
 import 'package:brainmri/models/patients_model.dart';
 import 'package:brainmri/screens/observation/brain/brain_observation_model.dart';
+import 'package:brainmri/screens/profile/organization_model.dart';
 import 'package:redux/redux.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -38,6 +39,9 @@ class UserState {
   final bool isFetchPatientSingleObservation;
   final bool isObservationsListLoading;
   final PatientModel? patientsAllObservations;
+  final OrganizationModel? organization;
+  final bool isFetchingOrganization;
+  final bool isSavingOrganizationDetails;
 
 
   UserState({
@@ -71,6 +75,9 @@ class UserState {
     this.isFetchPatientSingleObservation = false,
     this.isObservationsListLoading = false,
     this.patientsAllObservations,
+    this.organization,
+    this.isFetchingOrganization = false,
+    this.isSavingOrganizationDetails = false,
   });
 
   UserState copyWith({
@@ -104,6 +111,9 @@ class UserState {
     bool? isFetchPatientSingleObservation,
     bool? isObservationsListLoading,
     PatientModel? patientsAllObservations,
+    OrganizationModel? organization,
+    bool? isFetchingOrganization,
+    bool? isSavingOrganizationDetails,
 
   }) {
     return UserState(
@@ -137,6 +147,9 @@ class UserState {
       isFetchPatientSingleObservation: isFetchPatientSingleObservation ?? this.isFetchPatientSingleObservation,
       isObservationsListLoading: isObservationsListLoading ?? this.isObservationsListLoading,
       patientsAllObservations: patientsAllObservations ?? this.patientsAllObservations,
+      organization: organization ?? this.organization,
+      isFetchingOrganization: isFetchingOrganization ?? this.isFetchingOrganization,
+      isSavingOrganizationDetails: isSavingOrganizationDetails ?? this.isSavingOrganizationDetails,
     );
   }
 }
@@ -589,23 +602,46 @@ UserState reinitializeFormReducer(
 
 
 
-class GenerateConclusionAction {
+class GeminiGenerateConclusionAction {
   final String observation;
 
-  GenerateConclusionAction(this.observation);
+  GeminiGenerateConclusionAction(this.observation);
 }
 
-class GenerateConclusionResponse {
+class GeminiGenerateConclusionResponse {
   final String conclusion;
 
-  GenerateConclusionResponse(this.conclusion);
+  GeminiGenerateConclusionResponse(this.conclusion);
 }
 
-UserState generateConclusionReducer(UserState state, GenerateConclusionAction action) {
+UserState geminiGenerateConclusionReducer(UserState state, GeminiGenerateConclusionAction action) {
   return state.copyWith(isGeneratingConclusion: true);
 }
 
-UserState generateConclusionResponseReducer(UserState state, GenerateConclusionResponse action) {
+UserState geminiGenerateConclusionResponseReducer(UserState state, GeminiGenerateConclusionResponse action) {
+  return state.copyWith(
+    isGeneratingConclusion: false,
+    conclusion: action.conclusion,
+  );
+}
+
+class GptGenerateConclusionAction {
+  final String observation;
+
+  GptGenerateConclusionAction(this.observation);
+}
+
+class GptGenerateConclusionResponse {
+  final String conclusion;
+
+  GptGenerateConclusionResponse(this.conclusion);
+}
+
+UserState gptGenerateConclusionReducer(UserState state, GptGenerateConclusionAction action) {
+  return state.copyWith(isGeneratingConclusion: true);
+}
+
+UserState gptGenerateConclusionResponseReducer(UserState state, GptGenerateConclusionResponse action) {
   return state.copyWith(
     isGeneratingConclusion: false,
     conclusion: action.conclusion,
@@ -697,6 +733,55 @@ UserState saveReportUrlFirebaseReducer(UserState state, SaveReportUrlFirebaseAct
 UserState saveReportUrlFirebaseResponseReducer(UserState state, SaveReportUrlFirebaseActionResponse action) {
   return state;
 }
+
+
+class FetchOrganizationAction {
+  
+  FetchOrganizationAction();
+}
+
+class FetchOrganizationResponse {
+  final OrganizationModel organization;
+
+  FetchOrganizationResponse(this.organization);
+}
+
+UserState fetchOrganizationReducer(UserState state, FetchOrganizationAction action) {
+  return state.copyWith(isFetchingOrganization: true);
+}
+
+UserState fetchOrganizationResponseReducer(UserState state, FetchOrganizationResponse action) {
+  return state.copyWith(
+    isFetchingOrganization: false,
+    organization: action.organization,
+  );
+}
+
+
+class SaveOrganizationDetailsAction {
+  final OrganizationModel organization;
+
+  SaveOrganizationDetailsAction(this.organization);
+}
+
+class SaveOrganizationDetailsResponse {
+  final OrganizationModel organization;
+
+  SaveOrganizationDetailsResponse(this.organization);
+}
+
+UserState saveOrganizationDetailsReducer(UserState state, SaveOrganizationDetailsAction action) {
+  return state.copyWith(isSavingOrganizationDetails: true);
+}
+
+UserState saveOrganizationDetailsResponseReducer(UserState state, SaveOrganizationDetailsResponse action) {
+  return state.copyWith(
+    isSavingOrganizationDetails: false,
+    organization: action.organization,
+  );
+}
+
+
 
 
 
@@ -861,8 +946,10 @@ Reducer<UserState> userReducer = combineReducers<UserState>([
   TypedReducer<UserState, UpdatePatientConclusionResponse>(updatePatientConclusionResponseReducer),
   TypedReducer<UserState, SelectPatientAction>(selectPatientReducer),
   TypedReducer<UserState, ReinitializeFormAction>(reinitializeFormReducer),
-  TypedReducer<UserState, GenerateConclusionAction>(generateConclusionReducer),
-  TypedReducer<UserState, GenerateConclusionResponse>(generateConclusionResponseReducer),
+  TypedReducer<UserState, GeminiGenerateConclusionAction>(geminiGenerateConclusionReducer),
+  TypedReducer<UserState, GeminiGenerateConclusionResponse>(geminiGenerateConclusionResponseReducer),
+  TypedReducer<UserState, GptGenerateConclusionAction>(gptGenerateConclusionReducer),
+  TypedReducer<UserState, GptGenerateConclusionResponse>(gptGenerateConclusionResponseReducer),
   TypedReducer<UserState, SaveObservationAction>(saveObservationReducer),
   TypedReducer<UserState, GenerateReportAction>(generateReportReducer),
   TypedReducer<UserState, GenerateReportResponse>(generateReportResponseReducer),
@@ -876,11 +963,17 @@ Reducer<UserState> userReducer = combineReducers<UserState>([
   TypedReducer<UserState, HandleGenericErrorAction>(handleGenericErrorReducer),
   TypedReducer<UserState, ClearGenericErrorAction>(clearGenericErrorReducer),
   TypedReducer<UserState, SelectPatientObservationsAction>(selectPatientObservationsReducer),
+  TypedReducer<UserState, FetchOrganizationAction>(fetchOrganizationReducer),
+  TypedReducer<UserState, FetchOrganizationResponse>(fetchOrganizationResponseReducer),
+  TypedReducer<UserState, SaveOrganizationDetailsAction>(saveOrganizationDetailsReducer),
+  TypedReducer<UserState, SaveOrganizationDetailsResponse>(saveOrganizationDetailsResponseReducer),
+
 
   
   // ========== basic testing ========== //
   TypedReducer<UserState, SaveReportUrlFirebaseAction>(saveReportUrlFirebaseReducer),
   TypedReducer<UserState, SaveReportUrlFirebaseActionResponse>(saveReportUrlFirebaseResponseReducer),
+
 
   
   //==== simulations for testing purposes only ====//

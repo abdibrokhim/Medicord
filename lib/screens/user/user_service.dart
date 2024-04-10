@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:brainmri/auth/components/secure_storage.dart';
+import 'package:brainmri/screens/profile/organization_model.dart';
 import 'package:brainmri/utils/constants.dart';
 import 'package:brainmri/utils/shared.dart';
 import 'package:brainmri/utils/toast.dart';
@@ -34,6 +35,66 @@ class UserService {
     return await StorageService.readItemsFromToKeyChain().then((value) {
       return value['uuid'];
     });
+  }
+
+  static Future<OrganizationModel> fetchOrganizationDetails() async {
+    try {
+      print('Fetching organization details');
+
+            String? organizationId = await _getOrganizationId();
+      if (organizationId == null) {
+        showToast(message: 'No organization found', bgColor: getColor(AppColors.error));
+        return Future.error('No organization ID found');
+      }
+      print('organizationId: $organizationId');
+
+      DatabaseReference organizationRef = _firebaseDatabase.ref().child('organizations').child(organizationId);
+      DataSnapshot snapshot = (await organizationRef.once()).snapshot;
+
+      if (snapshot.exists) {
+        print('snapshot.value: ${snapshot.value}');
+
+        Map<dynamic, dynamic> organizationData = snapshot.value as Map<dynamic, dynamic>;
+        organizationData['id'] = organizationId;
+        print('organizationData: $organizationData');
+
+        return OrganizationModel.fromJson(organizationData);
+      } else {
+        return OrganizationModel();
+      }
+
+    } catch (e) {
+      showToast(message: 'An error has occured', bgColor: getColor(AppColors.error));
+      AppLog.log().e('Error while fetching organization details: $e');
+      return Future.error('Error while fetching organization details: $e');
+    }
+  }
+
+  static Future<OrganizationModel> saveOrganizationDetails(OrganizationModel organization) async {
+    try {
+      print('Saving organization details: ${organization.toJson()}');
+
+      String? organizationId = await _getOrganizationId();
+      if (organizationId == null) {
+        showToast(message: 'No organization found', bgColor: getColor(AppColors.error));
+        return Future.error('No organization ID found');
+      }
+      print('organizationId: $organizationId');
+
+      DatabaseReference organizationRef = _firebaseDatabase.ref().child('organizations').child(organizationId);
+      await organizationRef.update(organization.toJson());
+
+      showToast(message: 'Organization details saved', bgColor: getColor(AppColors.success));
+      AppLog.log().i('Organization details saved');
+
+      // return the updated organization details
+      return fetchOrganizationDetails();
+
+    } catch (e) {
+      showToast(message: 'An error has occured', bgColor: getColor(AppColors.error));
+      AppLog.log().e('Error while saving organization details: $e');
+      return Future.error('Error while saving organization details: $e');
+    }
   }
 
   
@@ -398,16 +459,16 @@ class UserService {
       );
       if (response.statusCode == 200) {
         final dynamic data = json.decode(response.body);
-        print('Generated conclusion: $data');
+        print('Generated conclusion (Gemini): $data');
         String conclusion = data['conclusion'];
         return conclusion;
       } else {
-        return Future.error('Failed to generate conclusion');
+        return Future.error('Failed to generate conclusion (Gemini)');
       }
     } catch (e) {
       showToast(message: 'An error has occured', bgColor: getColor(AppColors.error));
-      AppLog.log().e('Failed to generate conclusion: $e');
-      return Future.error('Failed to generate conclusion: $e');
+      AppLog.log().e('Failed to generate conclusion (Gemini): $e');
+      return Future.error('Failed to generate conclusion (Gemini): $e');
     }
   }
 
@@ -422,16 +483,40 @@ class UserService {
       );
       if (response.statusCode == 200) {
         final dynamic data = json.decode(response.body);
-        print('Generated conclusion: $data');
+        print('Generated conclusion (Gemma): $data');
         String conclusion = data['conclusion'];
         return conclusion;
       } else {
-        return Future.error('Failed to generate conclusion');
+        return Future.error('Failed to generate conclusion (Gemma)');
       }
     } catch (e) {
       showToast(message: 'An error has occured', bgColor: getColor(AppColors.error));
-      AppLog.log().e('Failed to generate conclusion: $e');
-      return Future.error('Failed to generate conclusion');
+      AppLog.log().e('Failed to generate conclusion (Gemma): $e');
+      return Future.error('Failed to generate conclusion (Gemma)');
+    }
+  }
+
+  static Future<String> gpt(String observation) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${Environments.backendServiceBaseUrl}/api/gpt-fine-tuned/conclusion'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({'query': observation}),
+      );
+      if (response.statusCode == 200) {
+        final dynamic data = json.decode(response.body);
+        print('Generated conclusion (GPT ): $data');
+        String conclusion = data;
+        return conclusion;
+      } else {
+        return Future.error('Failed to generate conclusion (GPT)');
+      }
+    } catch (e) {
+      showToast(message: 'An error has occured', bgColor: getColor(AppColors.error));
+      AppLog.log().e('Failed to generate conclusion (GPT ): $e');
+      return Future.error('Failed to generate conclusion (GPT )');
     }
   }
 
