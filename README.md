@@ -120,10 +120,12 @@ My product represents a new era in healthcare technology, one that prioritizes p
 
 
 ## 📚 Resources
+- [Pitch](https://youtu.be/769mUZFG3Ag)
 - [Presentation slides](https://slidesgo.com/editor/share/9b7e0887-bbf9-4aaf-adeb-7b5e076aee71#rs=link)
 - [Medicord demo, Phase 1, v0.1](https://vimeo.com/919786266?share=copy)
 - [Medicord UI/UX](https://www.figma.com/file/cu7fC6xrTkWqaoMjs8ESpi/MedHub?type=design&node-id=0%3A1&mode=design&t=jaSdZJiT80emMc52-1)
 - [Why Medicord? (brief pros & cons)](https://docs.google.com/document/d/1xBGhEOZTALeL1-RGXraYxaAgkySAVqAgzrHTtyls-jE/edit?usp=sharing)
+- [Download APK](https://drive.google.com/file/d/11GvDmid033QCQdQtmmj5AmlqSZwBVIJs/view?usp=drive_link)
 
 
 ## ✨ Quick Demo (Phase 1, v0.1)
