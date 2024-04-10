@@ -202,6 +202,7 @@ class _OrganizationScreenState extends State<OrganizationScreen> {
     String fullName = '';
     String phoneNumber = '';
     String fullAddress = '';
+    String displayName = 'No name';
 
   @override
   Widget build(BuildContext context) {
@@ -211,7 +212,6 @@ class _OrganizationScreenState extends State<OrganizationScreen> {
       final state = StoreProvider.of<GlobalState>(context).state;
 
           final String photoUrl = defaultProfileImage;
-    final String displayName = state.appState.userState.organization!.name!;
     final String email = user.email!;
 
     void updateValues() {
@@ -222,9 +222,9 @@ class _OrganizationScreenState extends State<OrganizationScreen> {
         // if (user.photoURL != null) {
         //   photoUrl = user.photoURL!;
         // } 
-        // if (state.appState.userState.organization!.name != null) {
-        //   displayName = state.appState.userState.organization!.name!;
-        // }
+        if (state.appState.userState.organization!.name != null) {
+          displayName = state.appState.userState.organization!.name!;
+        }
         // if (user.email != null) {
         //   email = user.email!;
         // }
@@ -284,6 +284,9 @@ StoreConnector<GlobalState, UserState>(
     print('store.state.appState.userState.organization!.phoneNumber: ${store.state.appState.userState.organization!.phoneNumber}');
     print('store.state.appState.userState.organization!.fullAddress: ${store.state.appState.userState.organization!.fullAddress}');
 
+        if (state.appState.userState.organization!.name != null) {
+          displayName = state.appState.userState.organization!.name!;
+        }
             if (state.appState.userState.organization!.fullName != null) {
           fullName = state.appState.userState.organization!.fullName!;
         }
