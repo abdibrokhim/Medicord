@@ -17,3 +17,40 @@ MRI signs of vascular encephalopathy with the presence of multiple ischemic foci
 
 Consultation with a neurologist is recommended.
 Consultation with an otolaryngologist is recommended.
+
+====
+
+Features and Values for Observation Report Template:
+observation.scanningTechnique: "T1 FSE-sagital, T2 FLAIR, T2 FSE-axial, T2 FSE-coronar, DWI"
+observation.minFocusDiameter: "3"
+observation.maxFocusDiameter: "10"
+observation.basalGangliaLocation: "usually located"
+observation.basalGangliaSymmetry: "symmetrical"
+observation.basalGangliaContour: "clear, even"
+observation.basalGangliaDimensions: "not changed"
+observation.basalGangliaSignal: "not changed"
+observation.cerebralLongitudinalFissureLocation: "centrally located"
+observation.convexitalGroovesCondition: "moderately widened"
+observation.lateralVentriclesSymmetry: "symmetrical"
+observation.lateralVentriclesWidthRight: "10"
+observation.lateralVentriclesWidthLeft: "14"
+observation.thirdVentricleWidth: "4"
+observation.sylvianAqueductCondition: "not changed"
+observation.fourthVentricleCondition: "tent-shaped and not dilated"
+observation.corpusCallosumCondition: "normal shape and size"
+observation.brainStemCondition: "without areas of pathological intensity"
+observation.cerebellumCondition: "normal shape"
+observation.cerebellarCortexWidthCondition: "reduced due to atrophy"
+observation.craniovertebralJunctionCondition: "unchanged"
+observation.pituitaryGlandCondition: "moderately flattened"
+observation.pituitaryGlandHeight: "3"
+observation.orbitalConesShape: "unchanged"
+observation.eyeballsShapeSize: "spherical in shape and of normal size"
+observation.opticNervesDiameter: "not changed"
+observation.perineuralSubarachnoidSpaceCondition: "moderately diffusely dilated"
+observation.extraocularMusclesCondition: "of normal size, the structure is without pathological signals"
+observation.retrobulbarFattyTissueCondition: "without pathological signals"
+observation.sinusesCystsPresence: True
+observation.sinusesCystsSize: "14"
+observation.sinusesPneumatization: "usually pneumatized"
+observation.additionalObservations: (None mentioned in the provided text)
