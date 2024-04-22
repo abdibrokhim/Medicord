@@ -9,16 +9,16 @@
 - 🍏 Xcode
 - 🍏 iOS Simulator
 
-### 📥 Clone Repository
+### 📥 Unzip the file
 
 ```bash
-git clone https://github.com/abdibrokhim/Medicord.git
+unzip CoMed.zip
 ```
 
 ### 📂 Go to the Project Directory
 
 ```bash
-cd Medicord
+cd CoMed
 ```
 
 ### 📦 Install Dependencies
@@ -57,9 +57,10 @@ flutter run
 flutter run -d chrome
 ```
 
-## ❓ How to Use (Phase 1, v0.1)
+`If you face any issues, please refer to stack overflow or the official website.`
 
-Make sure you already have the Backend API running on your local machine or on a server. You can find the backend API [here](https://github.com/abdibrokhim/Medicord-Service) and follow the instructions written in the [README.md](https://github.com/abdibrokhim/Medicord-Service/blob/main/README.md).
+
+## ❓ How to Use (CoMedAI)
 
 After running the app, you can either sign in with the following credentials (if you need pre-populated data like patients, observations, etc.):
 
@@ -72,9 +73,13 @@ Or you can create a new account and sign in.
 
 Once you have created an account, you can start exploring BrAIn MRI's features.
 
-### 🆕 Register New Patient
+### Choose the Scan Type
 
-To register a new patient, you need to enter the patient's full name and date of birth.
+You can choose the scan type from the dropdown menu.
+
+### Choose the Patient or Register a New Patient
+
+You can choose the patient from the dropdown menu or register a new patient.
 
 ### 📝 Fill Out the Form with Patient Brain MRI Details
 
@@ -90,12 +95,11 @@ Next, validate the diagnostic conclusion, after which it will be saved in the pa
 
 ### 📋 Manage Patient Records
 
-You can always manage patient records, such as:
-- **View:** by clicking on the eye icon.
-- **Edit Conclusion:** by clicking on the conclusion text.
-- **Generate PDF Report:** by clicking on the report icon.
+You can always manage patient observations. Just click on `All Observations` tab and you will see it.
+Don't forget to update hospital information in the `Organization` tab.
 
-Back to [README.md](https://github.com/abdibrokhim/Medicord/blob/main/README.md) for more info.
+
+Back to [README.md](https://github.com/abdibrokhim/Medicord/blob/main/README.md).
 
 ## 📚 External Resources
 
