@@ -200,11 +200,6 @@ int calculateLines(String text) {
 
         var state = StoreProvider.of<GlobalState>(context).state.appState.userState;
 
-    // Gemini model
-    // StoreProvider.of<GlobalState>(context).dispatch(
-    //   GeminiGenerateConclusionAction(state.observationString),
-    // );
-
         // GPT model
     StoreProvider.of<GlobalState>(context).dispatch(
       GptGenerateConclusionAction(state.observationString),
@@ -257,11 +252,6 @@ if (errors.isNotEmpty) {  // remove '!' in production
     Future.delayed(const Duration(seconds: 2));
     
     print('generating conclusion');
-    
-    // Gemini model
-    // StoreProvider.of<GlobalState>(context).dispatch(
-    //   GeminiGenerateConclusionAction(observationString),
-    // );
     
     // GPT model
     StoreProvider.of<GlobalState>(context).dispatch(

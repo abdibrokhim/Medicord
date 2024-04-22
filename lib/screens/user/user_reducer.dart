@@ -601,30 +601,6 @@ UserState reinitializeFormReducer(
 }
 
 
-
-class GeminiGenerateConclusionAction {
-  final String observation;
-
-  GeminiGenerateConclusionAction(this.observation);
-}
-
-class GeminiGenerateConclusionResponse {
-  final String conclusion;
-
-  GeminiGenerateConclusionResponse(this.conclusion);
-}
-
-UserState geminiGenerateConclusionReducer(UserState state, GeminiGenerateConclusionAction action) {
-  return state.copyWith(isGeneratingConclusion: true);
-}
-
-UserState geminiGenerateConclusionResponseReducer(UserState state, GeminiGenerateConclusionResponse action) {
-  return state.copyWith(
-    isGeneratingConclusion: false,
-    conclusion: action.conclusion,
-  );
-}
-
 class GptGenerateConclusionAction {
   final String observation;
 
@@ -946,8 +922,6 @@ Reducer<UserState> userReducer = combineReducers<UserState>([
   TypedReducer<UserState, UpdatePatientConclusionResponse>(updatePatientConclusionResponseReducer),
   TypedReducer<UserState, SelectPatientAction>(selectPatientReducer),
   TypedReducer<UserState, ReinitializeFormAction>(reinitializeFormReducer),
-  TypedReducer<UserState, GeminiGenerateConclusionAction>(geminiGenerateConclusionReducer),
-  TypedReducer<UserState, GeminiGenerateConclusionResponse>(geminiGenerateConclusionResponseReducer),
   TypedReducer<UserState, GptGenerateConclusionAction>(gptGenerateConclusionReducer),
   TypedReducer<UserState, GptGenerateConclusionResponse>(gptGenerateConclusionResponseReducer),
   TypedReducer<UserState, SaveObservationAction>(saveObservationReducer),

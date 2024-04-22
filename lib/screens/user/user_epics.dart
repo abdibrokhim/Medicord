@@ -90,17 +90,6 @@ Stream<dynamic> fetchAllPatientNamesEpic(Stream<dynamic> actions, EpicStore<Glob
           ]));
 }
 
-Stream<dynamic> geminiEpic(Stream<dynamic> actions, EpicStore<GlobalState> store) {
-  return actions
-      .where((action) => action is GeminiGenerateConclusionAction)
-      .asyncMap((action) => UserService.gemini(action.observation))
-      .flatMap<dynamic>((value) => Stream.fromIterable([
-            GeminiGenerateConclusionResponse(value),
-          ]))
-      .onErrorResume((error, stackTrace) => Stream.fromIterable([
-            HandleGenericErrorAction('Error while fetching patient names'),
-          ]));
-}
 
 Stream<dynamic> gptEpic(Stream<dynamic> actions, EpicStore<GlobalState> store) {
   return actions
@@ -280,7 +269,6 @@ List<Stream<dynamic> Function(Stream<dynamic>, EpicStore<GlobalState>)> userEffe
   savePatientObservationEpic,
   saveNewPatientEpic,
   fetchAllPatientNamesEpic,
-  geminiEpic,
   gptEpic,
   generateReportEpic,
   downloadReportEpic,

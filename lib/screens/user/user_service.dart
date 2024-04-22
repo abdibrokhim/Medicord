@@ -448,54 +448,6 @@ class UserService {
   }
 
 
-  static Future<String> gemini(String observation) async {
-    try {
-      final response = await http.post(
-        Uri.parse('${Environments.backendServiceBaseUrl}/api/gemini-fine-tuned/conclusion'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: json.encode({'query': observation}),
-      );
-      if (response.statusCode == 200) {
-        final dynamic data = json.decode(response.body);
-        print('Generated conclusion (Gemini): $data');
-        String conclusion = data['conclusion'];
-        return conclusion;
-      } else {
-        return Future.error('Failed to generate conclusion (Gemini)');
-      }
-    } catch (e) {
-      showToast(message: 'An error has occured', bgColor: getColor(AppColors.error));
-      AppLog.log().e('Failed to generate conclusion (Gemini): $e');
-      return Future.error('Failed to generate conclusion (Gemini): $e');
-    }
-  }
-
-  static Future<String> gemma(String observation) async {
-    try {
-      final response = await http.post(
-        Uri.parse('${Environments.backendServiceBaseUrl}/api/gemma-fine-tuned/conclusion'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: json.encode({'query': observation}),
-      );
-      if (response.statusCode == 200) {
-        final dynamic data = json.decode(response.body);
-        print('Generated conclusion (Gemma): $data');
-        String conclusion = data['conclusion'];
-        return conclusion;
-      } else {
-        return Future.error('Failed to generate conclusion (Gemma)');
-      }
-    } catch (e) {
-      showToast(message: 'An error has occured', bgColor: getColor(AppColors.error));
-      AppLog.log().e('Failed to generate conclusion (Gemma): $e');
-      return Future.error('Failed to generate conclusion (Gemma)');
-    }
-  }
-
   static Future<String> gpt(String observation) async {
     String language = 'English';
     try {
